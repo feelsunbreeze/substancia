@@ -1,0 +1,139 @@
+/* ————— the reading voice ————— */
+.prose-p {
+  margin: 0 0 16px;
+  max-width: 68ch;
+  font-size: 18px;
+  line-height: 1.64;
+  color: color-mix(in srgb, var(--ink) 90%, var(--muted));
+}
+.prose-p.drop::first-letter {
+  font-family: var(--display);
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.74;
+  padding: 6px 12px 0 0;
+  color: var(--pig, var(--ink));
+}
+
+.prose-strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ————— subheadings as quiet mono micro-labels, not competing serifs ————— */
+.prose-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pig, var(--muted));
+  margin: 30px 0 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--hair);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.prose-sub::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pig, var(--hair-strong));
+  flex-shrink: 0;
+}
+.prose-subsub {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 22px 0 10px;
+}
+
+/* ————— lists ————— */
+.prose-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  max-width: 68ch;
+}
+.prose-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ink) 88%, var(--muted));
+}
+.prose-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.72em;
+  width: 5px;
+  height: 1px;
+  background: var(--pig, var(--hair-strong));
+}
+
+/* ————— callouts: interaction notes lifted out of the flow ————— */
+.callout {
+  margin: 16px 0 20px;
+  padding: 12px 16px 14px;
+  border-left: 2px solid var(--callout-accent, var(--hair-strong));
+  background: color-mix(in srgb, var(--callout-accent, var(--muted)) 7%, transparent);
+  border-radius: 0 4px 4px 0;
+  max-width: 68ch;
+}
+.callout-dangerous { --callout-accent: var(--danger); }
+.callout-unsafe { --callout-accent: var(--warn); }
+.callout-uncertain { --callout-accent: var(--uncertain); }
+
+.callout-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.callout-icon { color: var(--callout-accent); flex-shrink: 0; }
+.callout-level {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--callout-accent);
+}
+.callout-sep { color: var(--faint); }
+.callout-subject {
+  font-family: var(--display);
+  font-size: 17px;
+}
+
+/* interaction reference names — link style by resolution kind */
+.refname {
+  padding: 0;
+  color: var(--ink);
+  font: inherit;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s, color 0.15s;
+}
+button.refname { cursor: pointer; }
+.refname.substance:hover { color: var(--callout-accent, var(--pig)); border-bottom-color: currentColor; }
+.refname.category {
+  border-bottom: 1px dashed color-mix(in srgb, var(--effect-accent) 60%, transparent);
+}
+.refname.category:hover { color: var(--effect-accent); border-bottom-color: var(--effect-accent); }
+.refname.none {
+  color: var(--muted);
+  border-bottom: 1px dotted var(--hair-strong);
+  cursor: help;
+}
+.callout-body {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: none;
+}

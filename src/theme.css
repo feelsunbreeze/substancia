@@ -1,0 +1,131 @@
+/* ============================================================
+   Substancia — design system (from the Design Bible)
+   Nocturne default · Vellum via [data-theme="light"]
+   ============================================================ */
+
+:root {
+  /* Nocturne — ink-blue night */
+  --ground: #0F1116;
+  --raised: #161A21;
+  --raised-2: #1D222B;
+  --ink: #E6E2D6;
+  --muted: #9AA1AB;
+  --faint: #6E757F;
+  --hair: #262B34;
+  --hair-strong: #3A414C;
+  --field: #0B0D12;
+
+  /* Apothecary pigments — the class-coding spine (lifted for dark ground) */
+  --psychedelic: #B084E0;
+  --dissociatives: #52B7CE;
+  --stimulants: #E0913F;
+  --depressant: #6C93D8;
+  --entactogen: #E272A6;
+  --opioids: #DB6558;
+  --nootropic: #63B884;
+  --cannabinoid: #A7C355;
+  --hallucinogens: #C58AD0;
+  --deliriant: #B5824A;
+  --antipsychotic: #8C97A4;
+  --eugeroics: #D6B84A;
+  --oneirogen: #57BBA2;
+  --antidepressants: #5AA9D4;
+  --hypnotic: #8E86D6;
+  --uncategorized: #9A9488;
+
+  --danger: #DB6558;
+  --warn: #E0913F;
+  --uncertain: #C9A24B;
+  --effect-accent: #C9AE6B;
+
+  --display: "Bodoni MT", "Didot", "Constantia", "Playfair Display", Georgia, serif;
+  --body: "Cambria", "Constantia", "Palatino Linotype", Georgia, serif;
+  --mono: "Cascadia Mono", "Consolas", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --measure: 640px;
+}
+
+:root[data-theme="light"] {
+  --ground: #E9E7DD;
+  --raised: #F1EFE6;
+  --raised-2: #DEDBCE;
+  --ink: #1A1D22;
+  --muted: #5C636C;
+  --faint: #8A9099;
+  --hair: #CBC7BA;
+  --hair-strong: #B3AEA0;
+  --field: #0B0D12;
+
+  --psychedelic: #7D51B8;
+  --dissociatives: #2E8AA0;
+  --stimulants: #C36A1E;
+  --depressant: #3A5FA8;
+  --entactogen: #C0417B;
+  --opioids: #C0392B;
+  --nootropic: #3C8C5A;
+  --cannabinoid: #6F851F;
+  --hallucinogens: #9A54B0;
+  --deliriant: #96682F;
+  --antipsychotic: #6B7682;
+  --eugeroics: #A8892A;
+  --oneirogen: #2F8E76;
+  --antidepressants: #3182AC;
+  --hypnotic: #6157A8;
+  --uncategorized: #7A756A;
+
+  --danger: #C0392B;
+  --warn: #C36A1E;
+  --uncertain: #9A7B25;
+  --effect-accent: #8F7233;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: color-mix(in srgb, var(--depressant) 40%, transparent); }
+
+/* ---- shared primitives ---- */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.mono { font-family: var(--mono); }
+.pigment-dot {
+  display: inline-block;
+  width: 0.62em; height: 0.62em;
+  border-radius: 50%;
+  vertical-align: baseline;
+}
+
+button {
+  font-family: var(--mono);
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+a { color: inherit; }
+
+:focus-visible { outline: 2px solid var(--depressant); outline-offset: 2px; border-radius: 2px; }
+
+/* thin scrollbars in the nocturne */
+* { scrollbar-width: thin; scrollbar-color: var(--hair-strong) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--hair-strong); border-radius: 6px; border: 2px solid var(--ground); }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

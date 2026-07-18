@@ -1,0 +1,120 @@
+.cat {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(48px, 5vw, 72px) clamp(18px, 4vw, 48px) 120px;
+  --pig: var(--effect-accent);
+}
+
+/* the header deliberately reads differently from a Specimen — a class, not a thing */
+.cat-header {
+  text-align: center;
+  padding-bottom: clamp(24px, 4vw, 40px);
+  margin-bottom: clamp(28px, 4vw, 44px);
+  border-bottom: 1px solid var(--hair);
+}
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+.cat-badge.kind-psychoactive { color: var(--effect-accent); border-color: color-mix(in srgb, var(--effect-accent) 40%, var(--hair)); }
+.cat-badge.kind-chemical { color: var(--dissociatives); border-color: color-mix(in srgb, var(--dissociatives) 40%, var(--hair)); }
+.cat-badge.kind-mechanism { color: var(--nootropic); border-color: color-mix(in srgb, var(--nootropic) 40%, var(--hair)); }
+.cat-name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(40px, 7vw, 74px);
+  line-height: 1;
+  margin: 0;
+  text-wrap: balance;
+}
+.cat-aliases {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-top: 16px;
+}
+
+.cat-body {
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure)) 300px;
+  gap: 0 50px;
+  align-items: start;
+  justify-content: center;
+}
+
+.cat-nodesc { font-style: italic; color: var(--muted); }
+.cat-source {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hair-strong);
+}
+.cat-source:hover { color: var(--ink); }
+
+.cat-members {
+  position: sticky;
+  top: 52px;
+  border-left: 1px solid var(--hair);
+  padding-left: 26px;
+}
+.cat-members h3 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 18px;
+  font-weight: 400;
+}
+.cat-count { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.cat-group { margin-bottom: 18px; }
+.cat-group-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cat-chip {
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--ink);
+  padding: 4px 9px;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.cat-chip:hover {
+  border-color: var(--hair-strong);
+  background: var(--raised);
+}
+
+@media (max-width: 900px) {
+  .cat-body { grid-template-columns: minmax(0, 680px); }
+  .cat-members {
+    position: static;
+    border-left: none;
+    border-top: 1px solid var(--hair);
+    padding: 22px 0 0;
+    margin-top: 24px;
+  }
+}

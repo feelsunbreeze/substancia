@@ -1,0 +1,116 @@
+/* The Arc — kinetic signature ------------------------------------------- */
+
+.ksig {
+  display: grid;
+  gap: 6px;
+}
+
+.ksig-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.ksig-arch {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.ksig-note {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+  text-transform: lowercase;
+}
+
+.ksig-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.ksig-baseline {
+  stroke: var(--hair);
+  stroke-width: 1;
+}
+
+.ksig-plateau {
+  fill: var(--ink);
+  opacity: 0.035;
+}
+
+.ksig-area {
+  animation: ksig-fade 1.7s ease-out both;
+}
+
+.ksig-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ksig-draw 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* derivative markers — the moments of steepest change */
+.ksig-mark line {
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  opacity: 0.35;
+}
+.ksig-mark circle {
+  fill: var(--ground);
+  stroke-width: 1.5;
+}
+.ksig-mark {
+  opacity: 0;
+  animation: ksig-pop 0.5s ease-out 1.2s forwards;
+}
+
+.ksig-phases {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.ksig-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.ksig-after {
+  color: var(--faint);
+  opacity: 0.8;
+}
+
+.arc-empty {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+@keyframes ksig-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ksig-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ksig-pop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ksig-line { animation: none; stroke-dashoffset: 0; }
+  .ksig-area, .ksig-mark { animation: none; opacity: 1; }
+}

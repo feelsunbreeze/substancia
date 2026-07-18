@@ -1,0 +1,416 @@
+.specimen-loading {
+  padding: 24vh 24px 0;
+  text-align: center;
+  font-family: var(--body);
+  font-style: italic;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.specimen {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(48px, 5vw, 72px) clamp(18px, 4vw, 48px) 120px;
+}
+
+/* subtle sticky title, revealed on scroll, centered in the chrome strip */
+.sp-sticky {
+  position: fixed;
+  top: 7px;
+  left: 50%;
+  transform: translate(-50%, -8px);
+  z-index: 45;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--raised) 78%, transparent);
+  border: 1px solid var(--hair);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.sp-sticky.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.sp-sticky .pigment-dot { align-self: center; }
+.sp-sticky-name {
+  font-family: var(--display);
+  font-size: 15px;
+  color: var(--ink);
+}
+.sp-sticky-class {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* ——— header ——— */
+.sp-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: clamp(28px, 5vw, 56px);
+}
+.sp-compare {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--hair-strong);
+  border-radius: 3px;
+  padding: 7px 12px;
+  margin-top: 4px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+.sp-compare:hover {
+  color: var(--ink);
+  background: var(--raised);
+}
+.sp-rule {
+  width: 3px;
+  border-radius: 2px;
+}
+.sp-class-line .class-line-ref {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+.sp-class-line .class-line-ref:hover { opacity: 0.75; border-bottom-color: currentColor; }
+.sp-class-line {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sp-name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 8vw, 88px);
+  line-height: 0.95;
+  margin: 0;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+}
+.sp-aka {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+.sp-systematic {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--faint);
+  margin-top: 6px;
+}
+
+/* ——— three-column body ——— */
+.sp-body {
+  display: grid;
+  grid-template-columns: [vitals] 220px [column] minmax(0, var(--measure)) [refs] 1fr;
+  gap: 0 44px;
+  align-items: start;
+}
+
+/* left + right margins share styling */
+.sp-vitals,
+.sp-refs {
+  position: sticky;
+  top: 52px;
+  display: grid;
+  gap: 26px;
+  align-self: start;
+}
+.sp-vitals { border-right: 1px solid var(--hair); padding-right: 22px; }
+.sp-refs { border-left: 1px solid var(--hair); padding-left: 22px; }
+
+.vital h3,
+.ref h3 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 10px;
+  font-weight: 400;
+}
+
+.vital-roa {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.dose-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.dose-table td {
+  padding: 3px 0;
+  vertical-align: baseline;
+}
+.dose-table td:first-child {
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+.dose-table td:last-child {
+  text-align: right;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.vital-dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.vital-dl dt { color: var(--faint); text-transform: uppercase; font-size: 10px; letter-spacing: 0.06em; }
+.vital-dl dd { margin: 0; text-align: right; color: var(--ink); }
+
+.vital-note {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* ——— dose arc ——— */
+.dose-arc { display: grid; gap: 6px; }
+.arc-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--hair); }
+.arc-seg { min-width: 2px; }
+.arc-labels { display: flex; }
+.arc-label { display: flex; flex-direction: column; min-width: 0; padding-right: 4px; }
+.arc-l-name { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arc-l-time { font-family: var(--mono); font-size: 11px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.arc-total { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
+.arc-empty { font-family: var(--mono); font-size: 11px; color: var(--faint); font-style: italic; }
+
+/* ——— center column ——— */
+.sp-column { min-width: 0; }
+.sp-summary {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0 0 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--hair);
+}
+
+/* hazard banner: replaces the italic summary when the source text is a
+   genuine overdose/death warning, not a description — deliberately not
+   italic, not quiet. */
+.sp-hazard {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin: 0 0 40px;
+  padding: 16px 20px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--hair-strong));
+  border-left-width: 3px;
+  border-radius: 0 6px 6px 0;
+  background: color-mix(in srgb, var(--danger) 9%, transparent);
+}
+.sp-hazard-icon { color: var(--danger); flex-shrink: 0; margin-top: 2px; }
+.sp-hazard-text {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.prose-section { margin-bottom: 40px; }
+.prose-h {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 34px);
+  margin: 0 0 18px;
+  letter-spacing: 0.005em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prose-icon {
+  color: var(--pig, var(--faint));
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+.prose-icon.hazard { color: var(--danger); }
+
+/* a section carrying a dangerous-interaction callout gets a heavier,
+   danger-tinted header so it reads as more prominent while scanning */
+.prose-section.hazardous {
+  padding: 20px 22px;
+  margin-left: -22px;
+  margin-right: -22px;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--hair));
+  border-left-width: 3px;
+  border-radius: 0 6px 6px 0;
+  background: color-mix(in srgb, var(--danger) 4%, transparent);
+}
+.prose-section.hazardous .prose-h { color: var(--danger); }
+
+.prose-legal { border-top: 1px solid var(--hair); padding-top: 36px; margin-top: 8px; }
+/* paragraph styling now lives in Prose.css (.prose-p) */
+
+/* phenomenology */
+.phen-group { margin-bottom: 24px; }
+.phen-cat {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pig, var(--muted));
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 6px;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.phen-icon { opacity: 0.95; flex-shrink: 0; }
+.phen-list { list-style: none; margin: 0; padding: 0; }
+.phen-list li { margin: 0 0 10px; font-size: 16px; line-height: 1.55; max-width: 68ch; }
+.phen-name {
+  font-family: var(--body);
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0;
+  border-bottom: 1px solid transparent;
+}
+.phen-name:hover {
+  color: var(--pig, var(--ink));
+  border-bottom-color: var(--pig, var(--hair-strong));
+}
+.phen-desc { color: var(--muted); }
+
+/* ——— right margin refs — compact, more visual than textual ——— */
+.sp-refs { gap: 18px; }
+.ref h3 { display: flex; align-items: baseline; gap: 7px; margin-bottom: 8px; }
+.ref-h-note {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--faint);
+  opacity: 0.7;
+}
+
+.ref-list { list-style: none; margin: 0; padding: 0; }
+
+/* name + magnitude bar — the bar carries the score visually so we shed digits */
+.ref-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 2.5px 0;
+}
+.ref-link {
+  font-family: var(--body);
+  font-size: 13.5px;
+  color: var(--ink);
+  text-align: left;
+  padding: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s, color 0.15s;
+}
+.ref-link:hover {
+  color: var(--pig, var(--ink));
+  border-bottom-color: var(--pig, var(--hair-strong));
+}
+.ref-meter {
+  position: relative;
+  width: 44px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hair);
+  overflow: hidden;
+}
+.ref-meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--pig, var(--muted));
+  opacity: 0.6;
+  border-radius: 2px;
+  transform-origin: left;
+  animation: ref-meter-grow 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes ref-meter-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.ref-tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.ref-tag.feels { color: color-mix(in srgb, var(--pig, var(--muted)) 70%, var(--faint)); }
+.ref-tag.binds { color: var(--faint); }
+
+/* signature effects — the hero of the right margin, as pigment chips */
+.sig-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.sig-chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  border: 1px solid var(--hair);
+  border-radius: 3px;
+  padding: 2.5px 7px;
+  line-height: 1.25;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.sig-chip:hover {
+  color: var(--pig, var(--ink));
+  border-color: color-mix(in srgb, var(--pig, var(--hair-strong)) 55%, var(--hair));
+  background: color-mix(in srgb, var(--pig, transparent) 8%, transparent);
+}
+
+.ixn-group { margin-bottom: 10px; }
+.ixn-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+.ixn-names { font-size: 13px; line-height: 1.45; }
+.ixn-names .ref-link { font-size: 13px; white-space: normal; overflow: visible; }
+
+/* ——— responsive: collapse margins ——— */
+@media (max-width: 1080px) {
+  .sp-body { grid-template-columns: minmax(0, 720px); justify-content: center; }
+  .sp-vitals, .sp-refs {
+    position: static;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    border: none;
+    padding: 20px 0;
+    border-top: 1px solid var(--hair);
+  }
+  .sp-vitals { order: 2; margin-top: 28px; }
+  .sp-refs { order: 3; }
+  .sp-column { order: 1; }
+}

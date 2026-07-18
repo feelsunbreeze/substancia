@@ -1,0 +1,60 @@
+.drag-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  z-index: 60;
+  -webkit-app-region: drag;
+}
+
+.chrome-controls {
+  position: fixed;
+  top: 9px;
+  right: 12px;
+  z-index: 70;
+  display: flex;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+.chrome-btn {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: transparent;
+  background: var(--hair-strong);
+  opacity: 0.55;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+.chrome-controls:hover .chrome-btn { opacity: 1; color: var(--ground); }
+.chrome-btn.min:hover { background: var(--eugeroics); }
+.chrome-btn.max:hover { background: var(--nootropic); }
+.chrome-btn.close:hover { background: var(--opioids); }
+
+.chrome-history {
+  position: fixed;
+  top: 8px;
+  left: 12px;
+  z-index: 70;
+  display: flex;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.chrome-back {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--raised) 70%, transparent);
+  backdrop-filter: blur(6px);
+  opacity: 0.7;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.chrome-back:hover { opacity: 1; color: var(--ink); background: var(--raised); }
+
+.chrome-forward { transform: translateX(2px); }

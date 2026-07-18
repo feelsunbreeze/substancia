@@ -1,0 +1,101 @@
+.tax {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(56px, 7vw, 88px) clamp(18px, 4vw, 48px) 120px;
+}
+
+.tax-header { margin-bottom: clamp(36px, 5vw, 56px); }
+.tax-title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(36px, 6vw, 58px);
+  line-height: 1.02;
+  margin: 12px 0 16px;
+  text-wrap: balance;
+}
+.tax-sub {
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 62ch;
+  margin: 0 0 26px;
+}
+.tax-search {
+  width: 100%;
+  max-width: 360px;
+  background: var(--raised);
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--body);
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+}
+.tax-search:focus { border-color: var(--hair-strong); }
+.tax-search::placeholder { color: var(--faint); font-style: italic; }
+
+.tax-section { margin-bottom: 44px; }
+.tax-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+.tax-section-head h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 22px;
+  margin: 0;
+}
+.tax-section-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--faint);
+  font-style: italic;
+}
+
+.tax-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.tax-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  background: var(--raised);
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.tax-card:hover {
+  border-color: var(--pig, var(--hair-strong));
+  background: var(--raised-2);
+  transform: translateY(-1px);
+}
+.tax-card-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pig, var(--uncategorized));
+  flex-shrink: 0;
+}
+.tax-card-name {
+  font-family: var(--body);
+  font-size: 15px;
+  color: var(--ink);
+  flex: 1;
+}
+.tax-card-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
