@@ -15,7 +15,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/feelsunbreeze/substancia?style=flat-square&color=6b4a8f)](https://github.com/feelsunbreeze/substancia/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/feelsunbreeze/substancia?style=flat-square&color=6b4a8f)](https://github.com/feelsunbreeze/substancia/stargazers)
 
-[**Download**](#-download) · [**Ko-fi**](https://ko-fi.com/feelsunbreeze) · [**Build from source**](#-build-from-source)
+[**Website**](https://feelsunbreeze.github.io/substancia/) · [**Download**](#-download) · [**Ko-fi**](https://ko-fi.com/feelsunbreeze) · [**Build from source**](#-build-from-source)
 
 </div>
 
@@ -129,7 +129,7 @@ If Substancia has been useful to you — saved you a dangerous combo, answered a
 
 [![Support on Ko-fi](https://img.shields.io/badge/Support%20on-Ko--fi-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=fff)](https://ko-fi.com/feelsunbreeze)
 
-Companies and orgs are welcome to sponsor too — see [the website](#) for sponsorship details.
+Companies and orgs are welcome to sponsor too — see [the website](https://feelsunbreeze.github.io/substancia/) for sponsorship details.
 
 ---
 
