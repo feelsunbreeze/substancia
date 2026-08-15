@@ -35,7 +35,6 @@ export default function Register() {
     setActive(0);
   }, []);
 
-  // global summon: Cmd/Ctrl-K or "/"
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !open)) {
@@ -78,7 +77,7 @@ export default function Register() {
 
   const choose = useCallback(
     (hit: SearchHit) => {
-      if (!hit.mapped) return; // nothing to open yet — unlinked substance/effect
+      if (!hit.mapped) return;
       if (hit.kind === "effect") navigate({ view: "effect", name: hit.name });
       else if (hit.kind === "category") navigate({ view: "category", name: hit.name });
       else navigate({ view: "specimen", name: hit.name });

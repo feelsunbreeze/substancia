@@ -4,8 +4,6 @@ import { useRouter } from "../lib/router";
 import Prose from "../components/Prose";
 import "./Effect.css";
 
-/** Remove the scraped "Psychoactive substances" section from the prose; the
- *  sidebar already shows the linked specimens grouped by class. */
 function withoutSubstanceList(blocks: Block[]): Block[] {
   const out: Block[] = [];
   let skipping = false;
@@ -41,7 +39,6 @@ export default function Effect({ name }: { name: string }) {
       </div>
     );
 
-  // group linked substances by psychoactive class, sorted by count desc
   const groups = new Map<string, typeof effect.substances>();
   for (const link of effect.substances) {
     if (!groups.has(link.category)) groups.set(link.category, []);

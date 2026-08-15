@@ -1,21 +1,18 @@
-/* ============================================================
-   Substancia — design system (from the Design Bible)
-   Nocturne default · Vellum via [data-theme="light"]
-   ============================================================ */
-
 :root {
-  /* Nocturne — ink-blue night */
-  --ground: #0F1116;
-  --raised: #161A21;
-  --raised-2: #1D222B;
-  --ink: #E6E2D6;
-  --muted: #9AA1AB;
-  --faint: #6E757F;
-  --hair: #262B34;
-  --hair-strong: #3A414C;
-  --field: #0B0D12;
 
-  /* Apothecary pigments — the class-coding spine (lifted for dark ground) */
+  --ground: #090A0F;
+  --raised: #0F1117;
+  --raised-2: #161921;
+  --ink: #E8E4D8;
+  --muted: #98A0AC;
+  --faint: #676E7A;
+  --hair: #1C1F29;
+  --hair-strong: #333947;
+  --field: #06070B;
+
+  --field-hi: #12141C;
+  --field-lo: #030407;
+
   --psychedelic: #B084E0;
   --dissociatives: #52B7CE;
   --stimulants: #E0913F;
@@ -43,6 +40,27 @@
   --mono: "Cascadia Mono", "Consolas", ui-monospace, "SF Mono", Menlo, monospace;
 
   --measure: 640px;
+
+  --dur-touch: 120ms;
+  --dur-shift: 240ms;
+  --dur-enter: 460ms;
+  --dur-scene: 720ms;
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root[data-theme="obsidian"] {
+  --ground: #000000;
+  --raised: #08080B;
+  --raised-2: #101116;
+  --ink: #E8E4D8;
+  --muted: #949CA8;
+  --faint: #636A76;
+  --hair: #16181F;
+  --hair-strong: #2C313D;
+  --field: #000000;
+  --field-hi: #0A0B10;
+  --field-lo: #000000;
 }
 
 :root[data-theme="light"] {
@@ -54,7 +72,10 @@
   --faint: #8A9099;
   --hair: #CBC7BA;
   --hair-strong: #B3AEA0;
-  --field: #0B0D12;
+
+  --field: #E4E1D4;
+  --field-hi: #F2F0E7;
+  --field-lo: #D5D1C2;
 
   --psychedelic: #7D51B8;
   --dissociatives: #2E8AA0;
@@ -93,7 +114,6 @@ body {
 
 ::selection { background: color-mix(in srgb, var(--depressant) 40%, transparent); }
 
-/* ---- shared primitives ---- */
 .eyebrow {
   font-family: var(--mono);
   font-size: 11px;
@@ -115,17 +135,103 @@ button {
   background: none;
   border: none;
   cursor: pointer;
+  transition: color var(--dur-touch) var(--ease-soft),
+              background-color var(--dur-touch) var(--ease-soft),
+              border-color var(--dur-touch) var(--ease-soft);
 }
 a { color: inherit; }
 
+.ink-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size var(--dur-shift) var(--ease-settle),
+              color var(--dur-touch) var(--ease-soft);
+}
+.ink-underline:hover,
+.ink-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+.pigment-dot {
+  transition: transform var(--dur-shift) var(--ease-settle),
+              box-shadow var(--dur-shift) var(--ease-settle);
+}
+.bloom:hover .pigment-dot,
+button:hover > .pigment-dot {
+  transform: scale(1.22);
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
+}
+
 :focus-visible { outline: 2px solid var(--depressant); outline-offset: 2px; border-radius: 2px; }
 
-/* thin scrollbars in the nocturne */
 * { scrollbar-width: thin; scrollbar-color: var(--hair-strong) transparent; }
 *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-thumb { background: var(--hair-strong); border-radius: 6px; border: 2px solid var(--ground); }
 *::-webkit-scrollbar-track { background: transparent; }
 
+@keyframes sub-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sub-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sub-wipe-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes sub-wipe-y {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes sub-from-left {
+  from { opacity: 0; transform: translateX(-22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sub-from-right {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes sub-settle {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+
+.cascade > * {
+  animation: sub-rise var(--dur-enter) var(--ease-settle) both;
+}
+.cascade > *:nth-child(1)  { animation-delay: 0ms }
+.cascade > *:nth-child(2)  { animation-delay: 40ms }
+.cascade > *:nth-child(3)  { animation-delay: 80ms }
+.cascade > *:nth-child(4)  { animation-delay: 120ms }
+.cascade > *:nth-child(5)  { animation-delay: 160ms }
+.cascade > *:nth-child(6)  { animation-delay: 200ms }
+.cascade > *:nth-child(7)  { animation-delay: 240ms }
+.cascade > *:nth-child(8)  { animation-delay: 280ms }
+.cascade > *:nth-child(9)  { animation-delay: 320ms }
+.cascade > *:nth-child(10) { animation-delay: 360ms }
+.cascade > *:nth-child(11) { animation-delay: 400ms }
+.cascade > *:nth-child(n+12) { animation-delay: 440ms }
+
+body,
+.specimen,
+.fx,
+.diptych {
+  transition: background-color var(--dur-enter) var(--ease-soft),
+              color var(--dur-enter) var(--ease-soft);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+:root[data-motion="still"] * {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0ms !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0ms !important;
 }

@@ -1,0 +1,218 @@
+.threshold {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgba(20, 23, 31, 0.72) 0%, rgba(5, 6, 10, 0.92) 70%);
+  backdrop-filter: blur(4px);
+  animation: th-veil-in 0.6s ease both;
+}
+.threshold.leaving {
+  animation: th-veil-out 0.42s ease both;
+  pointer-events: none;
+}
+
+@keyframes th-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes th-veil-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.threshold-card {
+  width: min(520px, calc(100vw - 56px));
+  background: color-mix(in srgb, var(--raised) 96%, transparent);
+  border: 1px solid var(--hair-strong);
+  border-radius: 6px;
+  padding: 22px 30px 20px;
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.62);
+  animation: th-card-in 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.threshold.leaving .threshold-card {
+  animation: th-card-out 0.4s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes th-card-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes th-card-out {
+  from { opacity: 1; transform: none; }
+
+  to { opacity: 0; transform: translateY(-10px) scale(1.02); }
+}
+
+.th-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  background: radial-gradient(110% 100% at 50% 40%, #14171f 0%, var(--field) 70%);
+  border: 1px solid var(--hair);
+}
+
+.th-motes circle {
+  transition:
+    transform 1150ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 700ms ease;
+}
+
+.th-region-labels text {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.11em;
+  fill: var(--ink);
+  opacity: 0;
+  animation: th-label-in 620ms ease both;
+}
+@keyframes th-label-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 0.62; transform: none; }
+}
+
+.th-links line {
+  stroke: var(--psychedelic);
+  stroke-width: 0.9;
+  opacity: 0;
+  animation: th-link-in 520ms ease both;
+}
+@keyframes th-link-in {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
+}
+
+.th-cursor path {
+  fill: var(--ink);
+  stroke: var(--field);
+  stroke-width: 0.8;
+  animation: th-cursor-in 900ms ease both 200ms;
+}
+@keyframes th-cursor-in {
+  from { opacity: 0; transform: translate(14px, 14px); }
+  to { opacity: 0.9; transform: none; }
+}
+
+.threshold-text {
+  animation: th-text-in 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
+  min-height: 132px;
+}
+@keyframes th-text-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
+.threshold-kicker {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 10px;
+}
+
+.threshold-title {
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1.12;
+  color: var(--ink);
+  margin: 0 0 11px;
+  font-weight: 400;
+}
+
+.threshold-title.grand {
+  font-size: 46px;
+  letter-spacing: 0.015em;
+}
+
+.threshold-body {
+  font-family: var(--body);
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--muted);
+  margin: 0;
+}
+
+.threshold-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--hair);
+  padding-top: 15px;
+  margin-top: 18px;
+}
+
+.threshold-pips {
+  display: flex;
+  gap: 7px;
+}
+.threshold-pip {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--hair-strong);
+  cursor: pointer;
+  transition: background 0.22s ease, transform 0.22s ease, width 0.28s ease;
+}
+.threshold-pip:hover { transform: scale(1.35); }
+.threshold-pip.done { background: var(--muted); }
+.threshold-pip.on {
+  background: var(--ink);
+  width: 17px;
+  border-radius: 3px;
+}
+
+.threshold-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.threshold-skip,
+.threshold-next {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 7px 13px;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+
+.threshold-skip {
+  background: none;
+  border: none;
+  color: var(--faint);
+}
+.threshold-skip:hover { color: var(--muted); }
+.threshold-skip:empty { display: none; }
+
+.threshold-next {
+  background: var(--raised-2);
+  border: 1px solid var(--hair-strong);
+  color: var(--ink);
+}
+.threshold-next:hover { background: var(--hair-strong); }
+.threshold-next:active { transform: translateY(1px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .threshold,
+  .threshold-card,
+  .threshold-text,
+  .th-region-labels text,
+  .th-links line,
+  .th-cursor path {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .th-motes circle {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

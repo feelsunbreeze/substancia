@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { getSubstance, getNeuro, getBipartite, makeResolver, Substance, NeuroProfile, BipartiteProfile, Range, Reference, pigment } from "../lib/api";
+import { getSubstance, getNeuro, getBipartite, makeResolver, getAtlas, atlasIndex, Substance, NeuroProfile, BipartiteProfile, AtlasNode, EffectAxes, Range, Reference, pigment } from "../lib/api";
+import { Signature, Kinship, Divergence, KinRow } from "../components/Sigils";
 import { useRouter, Route } from "../lib/router";
+import { recordVisit } from "../lib/traversal";
+import { useEdgeFade } from "../lib/useEdgeFade";
 import DoseArc from "../components/DoseArc";
 import Prose, { RefName } from "../components/Prose";
 import { NeuroBars } from "../components/NeuroBars";
 import { PROSE_ICONS, PHENOMENOLOGY_ICONS, IconPhenomenology, IconLegal, IconHazard } from "../lib/icons";
 import "./Specimen.css";
 
-// Legal status always closes the plate, regardless of what the wiki source
-// ordering was — everything else keeps its natural reading order.
 const PROSE_ORDER = [
   "History and culture",
   "Chemistry",
@@ -18,6 +19,8 @@ const PROSE_ORDER = [
   "Toxicity and harm potential",
 ];
 const LEGAL_SECTION = "Legal status";
+
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 
 function fmtRange(r: Range | null | undefined, units?: string | null): string | null {
   if (!r) return null;
@@ -34,6 +37,10 @@ export default function Specimen({ name }: { name: string }) {
   const [bipartite, setBipartite] = useState<BipartiteProfile | null>(null);
   const [resolve, setResolve] = useState<(n: string) => Reference>(() => (n: string) => ({ kind: "none" as const, name: n }));
   const [showSticky, setShowSticky] = useState(false);
+  const [kin, setKin] = useState<Map<string, AtlasNode> | null>(null);
+  const [axes, setAxes] = useState<EffectAxes | null>(null);
+  const vitalsFade = useEdgeFade<HTMLElement>();
+  const refsFade = useEdgeFade<HTMLElement>();
   const nameRef = useRef<HTMLHeadingElement | null>(null);
   const { navigate, restoreScroll } = useRouter();
 
@@ -41,7 +48,10 @@ export default function Specimen({ name }: { name: string }) {
     setSub(undefined);
     setNeuro(null);
     setBipartite(null);
-    getSubstance(name).then((s) => setSub(s));
+    getSubstance(name).then((s) => {
+      setSub(s);
+      if (s) recordVisit(name);
+    });
     getNeuro(name).then(setNeuro);
     getBipartite(name).then(setBipartite);
   }, [name]);
@@ -54,7 +64,11 @@ export default function Specimen({ name }: { name: string }) {
     makeResolver().then((fn) => setResolve(() => fn));
   }, []);
 
-  // reveal a subtle sticky title once the big name scrolls out of view
+  useEffect(() => {
+    atlasIndex().then(setKin);
+    getAtlas().then((a) => setAxes(a.effect_axes));
+  }, []);
+
   useEffect(() => {
     const el = nameRef.current;
     if (!el) return;
@@ -87,6 +101,25 @@ export default function Specimen({ name }: { name: string }) {
   const onNavigate = (ref: Reference) =>
     navigate({ view: ref.kind === "category" ? "category" : "specimen", name: ref.name } as Route);
 
+  const toKinRows = (list: { name: string; score: number }[]): KinRow[] =>
+    list.map((n) => {
+      const node = kin?.get(n.name);
+      return {
+        name: n.name,
+        score: n.score,
+        category: node?.category ?? "Uncategorized",
+        effectCount: node?.effect_count ?? 0,
+      };
+    });
+
+  const feelsRows = toKinRows(neighbors.slice(0, 6));
+  const bindsRows = toKinRows(bipartite?.target_neighbors.slice(0, 5) ?? []);
+
+  const allScores = [...feelsRows, ...bindsRows].map((r) => r.score);
+  const kinDomain: [number, number] = allScores.length
+    ? [Math.min(...allScores), Math.max(...allScores)]
+    : [0, 1];
+
   const interactionGroups: [string, { name: string }[] | null | undefined, string][] = [
     ["Dangerous", sub.dangerousInteractions, "var(--danger)"],
     ["Unsafe", sub.unsafeInteractions, "var(--warn)"],
@@ -95,14 +128,12 @@ export default function Specimen({ name }: { name: string }) {
 
   return (
     <article className="specimen" style={{ ["--pig" as any]: pig }}>
-      {/* subtle sticky title once the masthead scrolls away */}
       <div className={`sp-sticky ${showSticky ? "on" : ""}`}>
         <span className="pigment-dot" style={{ background: pig }} />
         <span className="sp-sticky-name">{sub.name}</span>
         <span className="sp-sticky-class">{category}</span>
       </div>
 
-      {/* ——— header ——— */}
       <header className="sp-header">
         <div className="sp-rule" style={{ background: pig }} />
         <div className="sp-heading">
@@ -131,10 +162,8 @@ export default function Specimen({ name }: { name: string }) {
         </button>
       </header>
 
-      {/* ——— three-column codex body ——— */}
       <div className="sp-body">
-        {/* LEFT MARGIN — vitals */}
-        <aside className="sp-vitals">
+        <aside className={`sp-vitals ${vitalsFade.className}`} ref={vitalsFade.ref}>
           {roa?.dose && (
             <section className="vital">
               <h3>Dose</h3>
@@ -201,7 +230,6 @@ export default function Specimen({ name }: { name: string }) {
           )}
         </aside>
 
-        {/* CENTER — the illuminated text */}
         <main className="sp-column">
           {sub.summary && (
             sub.summaryHazard ? (
@@ -220,15 +248,15 @@ export default function Specimen({ name }: { name: string }) {
             return (
               <section key={section} className={`prose-section ${isDangerous ? "hazardous" : ""}`}>
                 <h2 className="prose-h">
+                  <span className="prose-numeral" aria-hidden="true">{ROMAN[i] ?? i + 1}</span>
                   {isDangerous ? <IconHazard size={26} className="prose-icon hazard" /> : Icon && <Icon size={30} className="prose-icon" />}
                   {section}
                 </h2>
-                <Prose blocks={sub.prose[section]} dropcap={i === 0} resolve={resolve} onNavigate={onNavigate} />
+                <Prose blocks={sub.prose[section]} dropcap={i === 0} incipit resolve={resolve} onNavigate={onNavigate} />
               </section>
             );
           })}
 
-          {/* structured phenomenology */}
           {Object.keys(sub.subjective_effects).length > 0 && (
             <section className="prose-section phenomenology">
               <h2 className="prose-h">
@@ -257,7 +285,6 @@ export default function Specimen({ name }: { name: string }) {
             </section>
           )}
 
-          {/* legal status always closes the plate */}
           {!!sub.prose[LEGAL_SECTION]?.length && (
             <section className="prose-section prose-legal">
               <h2 className="prose-h">
@@ -269,60 +296,37 @@ export default function Specimen({ name }: { name: string }) {
           )}
         </main>
 
-        {/* RIGHT MARGIN — living cross-references */}
-        <aside className="sp-refs">
-          {signature.length > 0 && (
-            <section className="ref">
-              <h3>Signature</h3>
-              <div className="sig-chips">
-                {signature.map((e) => (
-                  <button key={e} className="sig-chip" onClick={() => goToEffect(e)}>{e}</button>
-                ))}
-              </div>
-            </section>
-          )}
+        <aside className={`sp-refs ${refsFade.className}`} ref={refsFade.ref}>
+          <section className="ref">
+            <h3>Signature <span className="ref-h-note">shape of the experience</span></h3>
+            <Signature
+              name={sub.name}
+              sections={sub.subjective_effects}
+              category={category}
+              effects={signature}
+              axes={axes}
+              onEffect={goToEffect}
+            />
+          </section>
 
-          {neighbors.length > 0 && (
+          {feelsRows.length > 0 && (
             <section className="ref">
               <h3>Nearest kin <span className="ref-h-note">feels alike</span></h3>
-              <ul className="ref-list">
-                {neighbors.slice(0, 6).map((n) => (
-                  <li key={n.name} className="ref-row">
-                    <button className="ref-link" onClick={() => goTo(n.name)}>{n.name}</button>
-                    <span className="ref-meter"><span className="ref-meter-fill" style={{ width: `${Math.round(n.score * 100)}%` }} /></span>
-                  </li>
-                ))}
-              </ul>
+              <Kinship id={`feels-${sub.name}`} rows={feelsRows} domain={kinDomain} onPick={goTo} />
             </section>
           )}
 
-          {bipartite && bipartite.target_neighbors.length > 0 && (
+          {bindsRows.length > 0 && (
             <section className="ref">
               <h3>Binds like <span className="ref-h-note">same targets</span></h3>
-              <ul className="ref-list">
-                {bipartite.target_neighbors.slice(0, 5).map((n) => (
-                  <li key={n.name} className="ref-row">
-                    <button className="ref-link" onClick={() => goTo(n.name)}>{n.name}</button>
-                    <span className="ref-meter"><span className="ref-meter-fill" style={{ width: `${Math.round(n.score * 100)}%` }} /></span>
-                  </li>
-                ))}
-              </ul>
+              <Kinship id={`binds-${sub.name}`} rows={bindsRows} domain={kinDomain} onPick={goTo} />
             </section>
           )}
 
           {bipartite && bipartite.divergence.length > 0 && (
             <section className="ref">
-              <h3>Divergence</h3>
-              <ul className="ref-list">
-                {bipartite.divergence.slice(0, 4).map((d) => (
-                  <li key={d.name} className="ref-row">
-                    <button className="ref-link" onClick={() => goTo(d.name)}>{d.name}</button>
-                    <span className={`ref-tag ${d.divergence > 0 ? "feels" : "binds"}`} title="feels-alike vs binds-alike">
-                      {d.divergence > 0 ? "feels≠binds" : "binds≠feels"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <h3>Divergence <span className="ref-h-note">where the two disagree</span></h3>
+              <Divergence id={`dvg-${sub.name}`} rows={bipartite.divergence.slice(0, 5)} onPick={goTo} />
             </section>
           )}
 

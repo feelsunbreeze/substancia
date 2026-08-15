@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getSubstance, search, compareNeuro, Substance, SearchHit, NeuroCompare, pigment, Range } from "../lib/api";
+import { getSubstance, search, compareNeuro, topDivergent, atlasIndex, Substance, SearchHit, NeuroCompare, DivergentPair, AtlasNode, pigment, Range } from "../lib/api";
 import { useRouter } from "../lib/router";
 import DoseArc from "../components/DoseArc";
 import { NeuroCompareBars } from "../components/NeuroBars";
@@ -69,6 +69,73 @@ function Picker({
   );
 }
 
+function Openings({ onPick }: { onPick: (a: string, b: string) => void }) {
+  const [pairs, setPairs] = useState<DivergentPair[]>([]);
+  const [index, setIndex] = useState<Map<string, AtlasNode> | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    topDivergent().then((p) => setPairs(p.slice(0, 6)));
+    atlasIndex().then(setIndex);
+    const t = window.setTimeout(() => setShown(true), 140);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  if (pairs.length === 0) return null;
+
+  const pig = (name: string) => pigment(index?.get(name)?.category ?? "Uncategorized");
+
+  return (
+    <section className="openings">
+      <div className="openings-head">
+        <span className="openings-label">where the codex disagrees with itself</span>
+        <span className="openings-note">
+          pairs that feel alike but bind differently — or the reverse
+        </span>
+      </div>
+
+      <div className="openings-grid">
+        {pairs.map((p, i) => {
+          const feelsLed = p.direction === "feels-alike-binds-different";
+          const y = (v: number) => 30 - Math.max(0, Math.min(1, v)) * 22;
+          return (
+            <button
+              key={`${p.a}-${p.b}`}
+              className={`opening${shown ? " in" : ""}`}
+              style={{ transitionDelay: `${i * 60}ms` }}
+              onClick={() => onPick(p.a, p.b)}
+            >
+              <span className="opening-names">
+                <span className="opening-n" style={{ color: pig(p.a) }}>{p.a}</span>
+                <span className="opening-x">/</span>
+                <span className="opening-n" style={{ color: pig(p.b) }}>{p.b}</span>
+              </span>
+
+              <svg className="opening-slope" viewBox="0 0 74 36" aria-hidden="true">
+                <line className="op-rail" x1="10" y1="6" x2="10" y2="30" />
+                <line className="op-rail" x1="64" y1="6" x2="64" y2="30" />
+                <line
+                  className="op-line"
+                  x1="10" y1={y(p.effect_sim)} x2="64" y2={y(p.target_sim)}
+                  style={{ stroke: feelsLed ? "var(--psychedelic)" : "var(--dissociatives)" }}
+                />
+                <circle cx="10" cy={y(p.effect_sim)} r="2.4"
+                        style={{ fill: feelsLed ? "var(--psychedelic)" : "var(--dissociatives)" }} />
+                <circle cx="64" cy={y(p.target_sim)} r="2.4"
+                        style={{ fill: feelsLed ? "var(--psychedelic)" : "var(--dissociatives)" }} />
+              </svg>
+
+              <span className="opening-read">
+                {feelsLed ? "feels alike · binds apart" : "binds alike · feels apart"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function fmtRange(r: Range | null | undefined): string | null {
   if (!r) return null;
   if (r.min != null && r.max != null) return `${r.min}–${r.max}`;
@@ -108,7 +175,6 @@ export default function Diptych({ a: initA, b: initB }: { a?: string; b?: string
   }, [aName, bName]);
 
   useEffect(() => {
-    // restore once either the picker or the comparison has rendered
     if ((aName && a === undefined) || (bName && b === undefined)) return;
     restoreScroll();
   }, [aName, bName, a, b, restoreScroll]);
@@ -136,11 +202,20 @@ export default function Diptych({ a: initA, b: initB }: { a?: string; b?: string
       <div className="diptych-setup">
         <div className="eyebrow">Room VII · The Diptych</div>
         <h1 className="dip-title">Hold two plates to the light</h1>
+        <p className="dip-lede">
+          Set any two specimens side by side — their dosing, their arc, the effects they share and
+          the ones only one of them causes, and how far their receptor profiles agree.
+        </p>
+
         <div className="picker-row">
           <Picker label="First" value={a?.name} onPick={setAName} />
           <span className="picker-vs">against</span>
           <Picker label="Second" value={b?.name} onPick={setBName} />
         </div>
+
+        <Openings
+          onPick={(x, y) => { setAName(x); setBName(y); }}
+        />
       </div>
     );
   }

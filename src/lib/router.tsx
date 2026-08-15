@@ -19,7 +19,6 @@ interface RouterCtx {
   forward: () => void;
   canBack: boolean;
   canForward: boolean;
-  /** views with async content should call this once they're rendered and loaded */
   restoreScroll: () => void;
 }
 
@@ -70,7 +69,6 @@ export function RouterProvider({ children }: { children: ReactNode }) {
 
   const back = useCallback(() => {
     if (index <= 0) return;
-    // scrollY for the current entry is already maintained by the scroll listener
     pendingRestore.current = scrollYs.current[index - 1];
     setIndex(index - 1);
   }, [index]);
@@ -88,7 +86,6 @@ export function RouterProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Alt+Left / Alt+Right walk the history, like a browser
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -99,7 +96,6 @@ export function RouterProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [back, forward]);
 
-  // keep the scroll position for the current entry up to date
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {

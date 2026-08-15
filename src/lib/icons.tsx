@@ -1,14 +1,5 @@
 import { ReactNode, ReactElement } from "react";
 
-/**
- * A bespoke line-icon set for Substancia — drawn to sit inside the codex,
- * not lifted from a generic icon font. One weight (1.25), no fills except
- * accenting dots, 20x20 viewBox. Each glyph is a small argument about what
- * the section actually is (an alembic for chemistry, a caduceus-less
- * receptor lock for pharmacology, scales for legal status) rather than a
- * stock pictogram.
- */
-
 interface IconProps {
   size?: number;
   className?: string;
@@ -33,10 +24,7 @@ function Svg({ size = 26, className, children }: IconProps & { children: ReactNo
   );
 }
 
-/* ————— prose-section icons ————— */
-
 export function IconHistory(p: IconProps) {
-  // an hourglass resting on its side — time passed, not time remaining
   return (
     <Svg {...p}>
       <path d="M5 4h10M5 16h10" />
@@ -46,7 +34,6 @@ export function IconHistory(p: IconProps) {
 }
 
 export function IconChemistry(p: IconProps) {
-  // an alembic / retort flask, angled neck
   return (
     <Svg {...p}>
       <path d="M8.5 3h3" />
@@ -57,7 +44,6 @@ export function IconChemistry(p: IconProps) {
 }
 
 export function IconPharmacology(p: IconProps) {
-  // a synapse — neurotransmitters crossing the cleft between two membranes
   return (
     <Svg {...p}>
       <path d="M3 5.5c3.2 1.7 10.8 1.7 14 0" />
@@ -70,7 +56,6 @@ export function IconPharmacology(p: IconProps) {
 }
 
 export function IconSubjectiveEffects(p: IconProps) {
-  // an eye with radiating perception lines
   return (
     <Svg {...p}>
       <path d="M2.5 10S5.8 5 10 5s7.5 5 7.5 5-3.3 5-7.5 5-7.5-5-7.5-5Z" />
@@ -81,7 +66,6 @@ export function IconSubjectiveEffects(p: IconProps) {
 }
 
 export function IconForms(p: IconProps) {
-  // a faceted crystal / tablet — the physical shape a substance takes
   return (
     <Svg {...p}>
       <path d="M10 2.5 15.5 7 13 17.5H7L4.5 7 10 2.5Z" />
@@ -91,7 +75,6 @@ export function IconForms(p: IconProps) {
 }
 
 export function IconResearch(p: IconProps) {
-  // an armillary-style compass / dividers, not a stock magnifier
   return (
     <Svg {...p}>
       <path d="M10 3v2.2M10 14.8V17M3 10h2.2M14.8 10H17" />
@@ -102,7 +85,6 @@ export function IconResearch(p: IconProps) {
 }
 
 export function IconToxicity(p: IconProps) {
-  // a drop with a fracture through it — harm, not a skull
   return (
     <Svg {...p}>
       <path d="M10 2.5S4.5 9 4.5 12.8a5.5 5.5 0 0 0 11 0C15.5 9 10 2.5 10 2.5Z" />
@@ -112,8 +94,6 @@ export function IconToxicity(p: IconProps) {
 }
 
 export function IconLegal(p: IconProps) {
-  // scales of justice, drawn heavier and full-canvas so it holds its own
-  // as the plate's closing mark
   return (
     <Svg {...p}>
       <path d="M10 2.5v14" />
@@ -126,7 +106,6 @@ export function IconLegal(p: IconProps) {
 }
 
 export function IconPhenomenology(p: IconProps) {
-  // a radiant star-burst — the felt texture beneath the categories
   return (
     <Svg {...p}>
       <path d="M10 2v4M10 14v4M2 10h4M14 10h4M4.2 4.2l2.8 2.8M13 13l2.8 2.8M4.2 15.8 7 13M13 7l2.8-2.8" />
@@ -135,10 +114,7 @@ export function IconPhenomenology(p: IconProps) {
   );
 }
 
-/* ————— phenomenology sub-category icons ————— */
-
 export function IconPhysical(p: IconProps) {
-  // a figure standing arms-out — the body as the site of the effect
   return (
     <Svg {...p}>
       <circle cx="10" cy="3.6" r="2" />
@@ -148,7 +124,6 @@ export function IconPhysical(p: IconProps) {
 }
 
 export function IconCognitive(p: IconProps) {
-  // thought coiling inward on itself — a single continuous spiral
   return (
     <Svg {...p}>
       <path d="M10 17c-3.9 0-7-3.1-7-7s2.7-6.3 6-6.3 5.2 2.2 5.2 5 -2 4.2-4.5 4.2-3.8-1.6-3.8-3.5 1.2-3 2.8-3" />
@@ -167,8 +142,6 @@ export function IconVisual(p: IconProps) {
 }
 
 export function IconAuditory(p: IconProps) {
-  // resonance rippling outward from a struck point — matches the
-  // radiating-line language used elsewhere rather than a literal ear
   return (
     <Svg {...p}>
       <circle cx="4.5" cy="10" r="1.1" fill="currentColor" stroke="none" />
@@ -180,7 +153,6 @@ export function IconAuditory(p: IconProps) {
 }
 
 export function IconMultisensory(p: IconProps) {
-  // three overlapping fields — senses blending
   return (
     <Svg {...p}>
       <circle cx="7.5" cy="8.5" r="4" />
@@ -191,7 +163,6 @@ export function IconMultisensory(p: IconProps) {
 }
 
 export function IconTranspersonal(p: IconProps) {
-  // a horizon dissolving outward — self extending past its edge
   return (
     <Svg {...p}>
       <circle cx="10" cy="10" r="3" />
@@ -201,7 +172,6 @@ export function IconTranspersonal(p: IconProps) {
 }
 
 export function IconDisconnective(p: IconProps) {
-  // a broken chain link
   return (
     <Svg {...p}>
       <rect x="3" y="7" width="6" height="9" rx="3" transform="rotate(-20 6 11.5)" />
@@ -211,7 +181,6 @@ export function IconDisconnective(p: IconProps) {
 }
 
 export function IconAftereffects(p: IconProps) {
-  // a receding trail of fading dots
   return (
     <Svg {...p}>
       <circle cx="4.5" cy="13" r="1.1" fill="currentColor" stroke="none" />
@@ -223,7 +192,6 @@ export function IconAftereffects(p: IconProps) {
 }
 
 export function IconParadoxical(p: IconProps) {
-  // two opposing curved arrows
   return (
     <Svg {...p}>
       <path d="M4 8a6 6 0 0 1 10-3.2M14 4.5V7h-2.4" />
@@ -233,7 +201,6 @@ export function IconParadoxical(p: IconProps) {
 }
 
 export function IconConfluence(p: IconProps) {
-  // two streams meeting into one — the interactions glyph
   return (
     <Svg {...p}>
       <path d="M4 2.5c0 4 3 5 6 6.5M16 2.5c0 4-3 5-6 6.5M10 9v8.5" />
@@ -242,8 +209,6 @@ export function IconConfluence(p: IconProps) {
 }
 
 export function IconHazard(p: IconProps) {
-  // a diamond marker with an exclamation — the codex's own hazard glyph,
-  // not a stock triangle
   return (
     <Svg {...p}>
       <path d="M10 2 17.5 10 10 18 2.5 10Z" />
@@ -254,7 +219,6 @@ export function IconHazard(p: IconProps) {
 }
 
 export function IconTaxonomy(p: IconProps) {
-  // shelves — the classes are stacks the codex is sorted onto
   return (
     <Svg {...p}>
       <path d="M3 4h14M3 10h14M3 16h14" />
@@ -266,7 +230,6 @@ export function IconTaxonomy(p: IconProps) {
 }
 
 export function IconSky(p: IconProps) {
-  // three stars over an arc — the firmament, as a nav glyph
   return (
     <Svg {...p}>
       <path d="M3 14a7 7 0 0 1 14 0" />

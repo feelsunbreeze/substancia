@@ -1,4 +1,3 @@
-/* ————— the reading voice ————— */
 .prose-p {
   margin: 0 0 16px;
   max-width: 68ch;
@@ -20,7 +19,6 @@
   color: var(--ink);
 }
 
-/* ————— subheadings as quiet mono micro-labels, not competing serifs ————— */
 .prose-sub {
   font-family: var(--mono);
   font-size: 11px;
@@ -53,7 +51,6 @@
   margin: 22px 0 10px;
 }
 
-/* ————— lists ————— */
 .prose-list {
   list-style: none;
   margin: 0 0 16px;
@@ -78,7 +75,6 @@
   background: var(--pig, var(--hair-strong));
 }
 
-/* ————— callouts: interaction notes lifted out of the flow ————— */
 .callout {
   margin: 16px 0 20px;
   padding: 12px 16px 14px;
@@ -111,7 +107,6 @@
   font-size: 17px;
 }
 
-/* interaction reference names — link style by resolution kind */
 .refname {
   padding: 0;
   color: var(--ink);
@@ -136,4 +131,28 @@ button.refname { cursor: pointer; }
   line-height: 1.55;
   color: var(--muted);
   max-width: none;
+}
+
+.prose-incipit {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.075em;
+  color: var(--ink);
+}
+
+.prose-p + .prose-p { text-indent: 1.4em; margin-top: -8px; }
+.prose-p.opens { text-indent: 0; }
+.prose-sub + .prose-p,
+.prose-subsub + .prose-p,
+.prose-list + .prose-p,
+.callout + .prose-p { text-indent: 0; margin-top: 0; }
+
+.prose-p {
+  hyphens: auto;
+  text-wrap: pretty;
+  hanging-punctuation: first last;
+}
+
+.prose-p.drop::first-letter {
+
+  color: var(--pig, var(--ink));
 }

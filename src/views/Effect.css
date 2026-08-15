@@ -79,3 +79,21 @@
   .fx-body { grid-template-columns: minmax(0, 640px); }
   .fx-refs { position: static; border-left: none; border-top: 1px solid var(--hair); padding: 20px 0 0; margin-top: 20px; }
 }
+
+.fx-header { animation: sub-fade var(--dur-shift) var(--ease-soft) both; }
+.fx-rule {
+  transform-origin: top center;
+  animation: sub-wipe-y var(--dur-scene) var(--ease-settle) both 80ms;
+}
+.fx-eyebrow { animation: sub-rise var(--dur-enter) var(--ease-settle) both 60ms; }
+.fx-name { animation: sub-rise var(--dur-enter) var(--ease-settle) both 120ms; }
+
+.fx-column { animation: sub-rise var(--dur-enter) var(--ease-settle) both 220ms; }
+
+.fx-refs > h3 { animation: sub-fade var(--dur-enter) var(--ease-soft) both 300ms; }
+.fx-group { animation: sub-rise var(--dur-enter) var(--ease-settle) both; }
+.fx-group:nth-of-type(1) { animation-delay: 340ms }
+.fx-group:nth-of-type(2) { animation-delay: 400ms }
+.fx-group:nth-of-type(3) { animation-delay: 460ms }
+.fx-group:nth-of-type(4) { animation-delay: 520ms }
+.fx-group:nth-of-type(n+5) { animation-delay: 570ms }

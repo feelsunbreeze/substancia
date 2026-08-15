@@ -13,7 +13,6 @@ export default function WindowChrome() {
 
   return (
     <>
-      {/* invisible drag strip across the top */}
       <div className="drag-strip" data-tauri-drag-region />
 
       <div className="chrome-history">

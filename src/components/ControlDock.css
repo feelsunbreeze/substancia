@@ -38,3 +38,9 @@
   margin-bottom: 2px;
 }
 .dock-btn.to-sky:hover { color: var(--ink); }
+
+.dock-sep {
+  height: 1px;
+  background: var(--hair);
+  margin: 3px 5px;
+}

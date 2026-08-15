@@ -34,7 +34,6 @@
 .neuro-fill.pos { background: var(--danger); opacity: 0.7; }
 .neuro-fill.neg { background: var(--dissociatives); opacity: 0.7; }
 
-/* ——— comparison layout for the Diptych ——— */
 .neuro-compare { display: grid; gap: 10px; }
 .neuro-compare-heads {
   display: flex;

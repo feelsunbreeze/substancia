@@ -18,8 +18,6 @@ function label(system: string): string {
   return SYSTEM_LABEL[system] ?? system[0].toUpperCase() + system.slice(1);
 }
 
-/** A single substance's fuzzy neurotransmitter profile — diverging bars
- * centered on zero (blocking/antagonist ↔ activating/agonist). */
 export function NeuroBars({ systems }: { systems: Record<string, number> }) {
   const rows = Object.entries(systems).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
   if (rows.length === 0) return null;
@@ -41,7 +39,6 @@ export function NeuroBars({ systems }: { systems: Record<string, number> }) {
   );
 }
 
-/** Two substances' profiles laid out as mirrored bars for direct comparison. */
 export function NeuroCompareBars({
   rows,
   nameA,

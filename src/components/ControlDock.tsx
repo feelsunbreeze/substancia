@@ -1,18 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "../lib/router";
 import { IconSky, IconTaxonomy } from "../lib/icons";
+import { applyTheme, applyMotion, readTheme, readMotion } from "./Settings";
 import "./ControlDock.css";
 
 export default function ControlDock() {
   const { navigate, route } = useRouter();
-  const [theme, setTheme] = useState<"dark" | "light">(
-    () => (localStorage.getItem("substancia-theme") as "dark" | "light") || "dark"
-  );
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("substancia-theme", theme);
-  }, [theme]);
+    applyTheme(readTheme());
+    applyMotion(readMotion());
+  }, []);
 
   return (
     <div className="dock">
@@ -70,13 +68,23 @@ export default function ControlDock() {
         </svg>
       </button>
 
+      <div className="dock-sep" />
+
       <button
         className="dock-btn"
-        title={theme === "dark" ? "Vellum" : "Nocturne"}
-        aria-label="Toggle theme"
-        onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+        title="Settings — theme, motion, start over"
+        aria-label="Settings"
+        onClick={() => window.dispatchEvent(new CustomEvent("substancia:settings"))}
       >
-        {theme === "dark" ? "☾" : "☀"}
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="2.3" stroke="currentColor" strokeWidth="1.3" />
+          <path
+            d="M8 1.6v1.9M8 12.5v1.9M14.4 8h-1.9M3.5 8H1.6M12.5 3.5l-1.3 1.3M4.8 11.2l-1.3 1.3M12.5 12.5l-1.3-1.3M4.8 4.8L3.5 3.5"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+          />
+        </svg>
       </button>
     </div>
   );

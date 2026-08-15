@@ -13,7 +13,6 @@
   padding: clamp(48px, 5vw, 72px) clamp(18px, 4vw, 48px) 120px;
 }
 
-/* subtle sticky title, revealed on scroll, centered in the chrome strip */
 .sp-sticky {
   position: fixed;
   top: 7px;
@@ -50,7 +49,6 @@
   color: var(--faint);
 }
 
-/* ——— header ——— */
 .sp-header {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -119,15 +117,14 @@
   margin-top: 6px;
 }
 
-/* ——— three-column body ——— */
 .sp-body {
   display: grid;
-  grid-template-columns: [vitals] 220px [column] minmax(0, var(--measure)) [refs] 1fr;
+
+  grid-template-columns: [vitals] 220px [column] minmax(0, var(--measure)) [refs] minmax(244px, 1fr);
   gap: 0 44px;
   align-items: start;
 }
 
-/* left + right margins share styling */
 .sp-vitals,
 .sp-refs {
   position: sticky;
@@ -135,9 +132,53 @@
   display: grid;
   gap: 26px;
   align-self: start;
+
+  max-height: calc(100vh - 52px - 28px);
+  overflow-y: auto;
+
+  overscroll-behavior-y: auto;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.sp-vitals::-webkit-scrollbar,
+.sp-refs::-webkit-scrollbar { width: 0; height: 0; }
+
 .sp-vitals { border-right: 1px solid var(--hair); padding-right: 22px; }
 .sp-refs { border-left: 1px solid var(--hair); padding-left: 22px; }
+
+@property --fade-up {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-down {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.edge-fade {
+  --fade-up: 0px;
+  --fade-down: 0px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-up),
+    #000 calc(100% - var(--fade-down)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-up),
+    #000 calc(100% - var(--fade-down)),
+    transparent 100%
+  );
+  transition: --fade-up 0.25s ease, --fade-down 0.25s ease;
+}
+.edge-fade.fade-up { --fade-up: 26px; }
+.edge-fade.fade-down { --fade-down: 34px; }
 
 .vital h3,
 .ref h3 {
@@ -197,7 +238,6 @@
   color: var(--muted);
 }
 
-/* ——— dose arc ——— */
 .dose-arc { display: grid; gap: 6px; }
 .arc-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--hair); }
 .arc-seg { min-width: 2px; }
@@ -208,7 +248,6 @@
 .arc-total { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
 .arc-empty { font-family: var(--mono); font-size: 11px; color: var(--faint); font-style: italic; }
 
-/* ——— center column ——— */
 .sp-column { min-width: 0; }
 .sp-summary {
   font-family: var(--body);
@@ -221,9 +260,6 @@
   border-bottom: 1px solid var(--hair);
 }
 
-/* hazard banner: replaces the italic summary when the source text is a
-   genuine overdose/death warning, not a description — deliberately not
-   italic, not quiet. */
 .sp-hazard {
   display: flex;
   gap: 14px;
@@ -261,8 +297,6 @@
 }
 .prose-icon.hazard { color: var(--danger); }
 
-/* a section carrying a dangerous-interaction callout gets a heavier,
-   danger-tinted header so it reads as more prominent while scanning */
 .prose-section.hazardous {
   padding: 20px 22px;
   margin-left: -22px;
@@ -275,9 +309,7 @@
 .prose-section.hazardous .prose-h { color: var(--danger); }
 
 .prose-legal { border-top: 1px solid var(--hair); padding-top: 36px; margin-top: 8px; }
-/* paragraph styling now lives in Prose.css (.prose-p) */
 
-/* phenomenology */
 .phen-group { margin-bottom: 24px; }
 .phen-cat {
   font-family: var(--mono);
@@ -308,7 +340,6 @@
 }
 .phen-desc { color: var(--muted); }
 
-/* ——— right margin refs — compact, more visual than textual ——— */
 .sp-refs { gap: 18px; }
 .ref h3 { display: flex; align-items: baseline; gap: 7px; margin-bottom: 8px; }
 .ref-h-note {
@@ -322,7 +353,6 @@
 
 .ref-list { list-style: none; margin: 0; padding: 0; }
 
-/* name + magnitude bar — the bar carries the score visually so we shed digits */
 .ref-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -376,7 +406,6 @@
 .ref-tag.feels { color: color-mix(in srgb, var(--pig, var(--muted)) 70%, var(--faint)); }
 .ref-tag.binds { color: var(--faint); }
 
-/* signature effects — the hero of the right margin, as pigment chips */
 .sig-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .sig-chip {
   font-family: var(--mono);
@@ -400,7 +429,6 @@
 .ixn-names { font-size: 13px; line-height: 1.45; }
 .ixn-names .ref-link { font-size: 13px; white-space: normal; overflow: visible; }
 
-/* ——— responsive: collapse margins ——— */
 @media (max-width: 1080px) {
   .sp-body { grid-template-columns: minmax(0, 720px); justify-content: center; }
   .sp-vitals, .sp-refs {
@@ -409,8 +437,44 @@
     border: none;
     padding: 20px 0;
     border-top: 1px solid var(--hair);
+
+    max-height: none;
+    overflow-y: visible;
+  }
+  .sp-vitals.edge-fade, .sp-refs.edge-fade {
+    -webkit-mask-image: none;
+    mask-image: none;
   }
   .sp-vitals { order: 2; margin-top: 28px; }
   .sp-refs { order: 3; }
   .sp-column { order: 1; }
+}
+
+.prose-numeral {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  opacity: 0.7;
+  align-self: center;
+  min-width: 22px;
+  text-align: right;
+  margin-left: -34px;
+  padding-right: 12px;
+}
+@media (max-width: 1080px) {
+
+  .prose-numeral { margin-left: 0; padding-right: 6px; }
+}
+
+.prose-section + .prose-section::before,
+.prose-section + .prose-legal::before {
+  content: "❦";
+  display: block;
+  text-align: center;
+  font-size: 15px;
+  color: var(--faint);
+  opacity: 0.34;
+  margin: 6px 0 34px;
+  transform: rotate(-2deg);
 }

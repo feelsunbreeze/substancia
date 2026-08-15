@@ -1,11 +1,6 @@
 import { ReactNode, useRef, useState, useCallback } from "react";
 import "./Tooltip.css";
 
-/**
- * A custom hover tooltip in the app's own voice — replaces the browser's
- * native title="" bubble. Positions itself above the trigger, follows into
- * view, and fades. Purely presentational (aria handled by the trigger).
- */
 export default function Tooltip({
   label,
   children,

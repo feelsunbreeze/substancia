@@ -1,0 +1,253 @@
+.sig-svg {
+  display: block;
+  width: 100%;
+  max-width: 236px;
+  height: auto;
+  overflow: visible;
+}
+
+.sig-ring {
+  fill: none;
+  stroke: var(--hair);
+  stroke-width: 1;
+}
+.sig-spoke {
+  stroke: var(--hair);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.sig-shape {
+  fill-opacity: 0.14;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.72);
+  transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+.sig-shape.drawn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sig-vertex {
+  opacity: 0;
+  transition: r 0.16s ease, opacity 0.4s ease 0.34s;
+  stroke: var(--field);
+  stroke-width: 1.4;
+}
+.sig-vertex.drawn { opacity: 1; }
+
+.sig-hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.sig-axis {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  fill: var(--faint);
+  transition: fill 0.16s ease;
+}
+.sig-axis.on { fill: var(--ink); }
+
+.sig-readout {
+  min-height: 19px;
+  margin-top: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.sig-readout-n {
+  font-size: 14px;
+  color: var(--ink);
+}
+.sig-readout-l { color: var(--muted); }
+.sig-readout-hint { color: var(--faint); opacity: 0.75; }
+
+.sig-most {
+  margin-top: 12px;
+  border-top: 1px solid var(--hair);
+  padding-top: 10px;
+}
+.sig-most-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+.sig-most-list {
+  font-family: var(--body);
+  font-size: 12.5px;
+  line-height: 1.62;
+  color: var(--muted);
+}
+.sig-most-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.sig-most-link:hover {
+  color: var(--ink);
+  border-bottom-color: var(--hair-strong);
+}
+.sig-most-sep { color: var(--faint); opacity: 0.6; }
+
+.kin-svg {
+  display: block;
+  width: 100%;
+  max-width: 236px;
+  height: auto;
+  overflow: visible;
+}
+
+.kin-cap {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  fill: var(--faint);
+}
+.kin-axis {
+  stroke: var(--hair);
+  stroke-width: 1;
+}
+.kin-anchor {
+  stroke: var(--hair-strong);
+  stroke-width: 1;
+}
+
+.kin-g {
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.44s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kin-g.in {
+  opacity: 1;
+  transform: none;
+}
+
+.kin-hit { fill: transparent; }
+
+.kin-tether {
+  stroke: var(--hair-strong);
+  stroke-width: 1;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+.kin-dot {
+  stroke: var(--ground);
+  stroke-width: 1.5;
+  transition: r 0.16s ease;
+}
+.kin-name {
+  font-family: var(--body);
+  font-size: 12.5px;
+  fill: var(--ink);
+  transition: fill 0.15s ease;
+}
+.kin-g.on .kin-tether { opacity: 1; }
+.kin-g.on .kin-name { fill: var(--effect-accent); }
+
+.kin-readout {
+  min-height: 18px;
+  margin-top: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.kin-readout-n {
+  font-size: 13px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.kin-readout-l { color: var(--muted); }
+.kin-readout-hint { color: var(--faint); opacity: 0.7; }
+
+.dvg-svg {
+  display: block;
+  width: 100%;
+  max-width: 236px;
+  height: auto;
+  overflow: visible;
+}
+
+.dvg-rail {
+  stroke: var(--hair-strong);
+  stroke-width: 1;
+}
+.dvg-rail-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  fill: var(--faint);
+}
+
+.dvg-g {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.dvg-g.in { opacity: 1; }
+.dvg-hit {
+  stroke: transparent;
+  stroke-width: 14;
+}
+.dvg-line {
+  stroke-width: 1.6;
+  opacity: 0.55;
+  transition: opacity 0.16s ease, stroke-width 0.16s ease;
+}
+.dvg-end {
+  opacity: 0.7;
+  stroke: var(--ground);
+  stroke-width: 1.2;
+  transition: opacity 0.16s ease;
+}
+.dvg-name {
+  font-family: var(--body);
+  font-size: 11px;
+  fill: var(--muted);
+  transition: fill 0.16s ease;
+}
+.dvg-g.on .dvg-line { opacity: 1; stroke-width: 2.4; }
+.dvg-g.on .dvg-end { opacity: 1; }
+.dvg-g.on .dvg-name { fill: var(--ink); }
+
+.dvg-key {
+  font-family: var(--body);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--faint);
+  margin: 9px 0 0;
+}
+.dvg-key em {
+  font-style: normal;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sig-shape,
+  .sig-vertex,
+  .kin-g,
+  .dvg-g {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

@@ -4,7 +4,6 @@ import { IconConfluence } from "../lib/icons";
 import Tooltip from "./Tooltip";
 import "./Prose.css";
 
-/** inline **bold** -> accented strong, everything else plain */
 function Inline({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return (
@@ -20,6 +19,46 @@ function Inline({ text }: { text: string }) {
   );
 }
 
+function headingText(text: string): string {
+  const t = text.trim();
+  const inner = t.slice(2, -2);
+  return t.startsWith("**") && t.endsWith("**") && !inner.includes("**") ? inner : t;
+}
+
+function splitIncipit(text: string): [string, string] | null {
+  const t = text.trimStart();
+  if (t.startsWith("**")) return null;
+
+  const words = t.split(" ");
+  const taken: string[] = [];
+  let chars = 0;
+  for (const w of words) {
+    if (w.includes("*") || w.includes("[")) break;
+    if (w.length > 14 || /[()[\]{}\d/]/.test(w)) break;
+    taken.push(w);
+    chars += w.length + 1;
+    if (taken.length >= 4 || chars >= 22) break;
+  }
+
+  const dangles = (w: string) => {
+    const bare = w.toLowerCase().replace(/[,;:]$/, "");
+    return DANGLING.has(bare) || (bare.includes("-") && !bare.endsWith("-"));
+  };
+  while (taken.length && dangles(taken[taken.length - 1])) taken.pop();
+  if (taken.length < 2) return null;
+
+  const head = taken.join(" ");
+  const rest = t.slice(head.length);
+  if (rest.trim().length < 40) return null;
+  return [head, rest];
+}
+
+const DANGLING = new Set([
+  "and", "or", "of", "the", "a", "an", "to", "in", "on", "at", "by", "for",
+  "with", "was", "were", "is", "are", "be", "been", "who", "that", "which",
+  "but", "as", "from", "its", "it", "their", "this", "these", "has", "have",
+]);
+
 const LEVEL_LABEL: Record<string, string> = {
   dangerous: "Dangerous",
   unsafe: "Unsafe",
@@ -29,12 +68,11 @@ const LEVEL_LABEL: Record<string, string> = {
 interface ProseProps {
   blocks: Block[];
   dropcap?: boolean;
-  /** resolve an interaction subject to a substance / category / dead end */
+  incipit?: boolean;
   resolve?: (name: string) => Reference;
   onNavigate?: (ref: Reference) => void;
 }
 
-/** an interaction subject rendered as the right kind of link (or a tooltip'd dead end) */
 export function RefName({
   subject,
   className,
@@ -95,16 +133,17 @@ function Callout({
   );
 }
 
-export default function Prose({ blocks, dropcap = false, resolve, onNavigate }: ProseProps) {
+export default function Prose({ blocks, dropcap = false, incipit = false, resolve, onNavigate }: ProseProps) {
   let firstPara = dropcap;
+  let firstOfSection = incipit;
   return (
     <>
       {blocks.map((b, i) => {
         switch (b.type) {
           case "h3":
-            return <h3 key={i} className="prose-sub">{b.text}</h3>;
+            return <h3 key={i} className="prose-sub"><Inline text={headingText(b.text)} /></h3>;
           case "h4":
-            return <h4 key={i} className="prose-subsub">{b.text}</h4>;
+            return <h4 key={i} className="prose-subsub"><Inline text={headingText(b.text)} /></h4>;
           case "list":
             return (
               <ul key={i} className="prose-list">
@@ -126,10 +165,20 @@ export default function Prose({ blocks, dropcap = false, resolve, onNavigate }: 
             );
           default: {
             const drop = firstPara;
+            const opens = firstOfSection;
             firstPara = false;
+            firstOfSection = false;
+            const parts = opens ? splitIncipit(b.text) : null;
             return (
-              <p key={i} className={drop ? "prose-p drop" : "prose-p"}>
-                <Inline text={b.text} />
+              <p key={i} className={`prose-p${drop ? " drop" : ""}${opens ? " opens" : ""}`}>
+                {parts ? (
+                  <>
+                    <span className="prose-incipit">{parts[0]}</span>
+                    <Inline text={parts[1]} />
+                  </>
+                ) : (
+                  <Inline text={b.text} />
+                )}
               </p>
             );
           }

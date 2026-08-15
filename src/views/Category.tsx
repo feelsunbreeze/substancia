@@ -33,7 +33,6 @@ export default function Category({ name }: { name: string }) {
   if (cat === null)
     return <div className="specimen-loading"><em>{name}</em> is referenced but has no class page yet.</div>;
 
-  // group members by psychoactive class
   const groups = new Map<string, typeof cat.members>();
   for (const m of cat.members) {
     if (!groups.has(m.category)) groups.set(m.category, []);

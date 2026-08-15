@@ -99,7 +99,6 @@
 }
 .picker-hits li button:hover { background: var(--raised); }
 
-/* ——— comparison layout ——— */
 .diptych {
   max-width: 1000px;
   margin: 0 auto;
@@ -204,4 +203,156 @@
 @media (max-width: 720px) {
   .dip-cols, .dip-effect-cols { grid-template-columns: 1fr; gap: 20px; }
   .picker-row { grid-template-columns: 1fr; }
+}
+
+.dip-lede {
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 46ch;
+  margin: 14px 0 30px;
+  animation: dip-rise var(--dur-enter) var(--ease-settle) both 60ms;
+}
+
+@keyframes dip-rise {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: none; }
+}
+
+.openings {
+  margin-top: 46px;
+  border-top: 1px solid var(--hair);
+  padding-top: 20px;
+  animation: dip-rise var(--dur-enter) var(--ease-settle) both 200ms;
+}
+
+.openings-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.openings-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.openings-note {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--faint);
+  opacity: 0.85;
+}
+
+.openings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.opening {
+  display: grid;
+  grid-template-columns: 1fr 74px;
+  grid-template-areas:
+    "names slope"
+    "read  slope";
+  align-items: center;
+  gap: 2px 10px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--hair);
+  border-radius: 5px;
+  background: transparent;
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--dur-enter) var(--ease-soft),
+              transform var(--dur-enter) var(--ease-settle),
+              border-color var(--dur-touch) var(--ease-soft),
+              background-color var(--dur-touch) var(--ease-soft);
+}
+.opening.in { opacity: 1; transform: none; }
+.opening:hover {
+  border-color: var(--hair-strong);
+  background: var(--raised);
+}
+
+.opening-names {
+  grid-area: names;
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.25;
+}
+.opening-x {
+  color: var(--faint);
+  margin: 0 5px;
+  opacity: 0.6;
+}
+.opening-read {
+  grid-area: read;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 3px;
+}
+
+.opening-slope {
+  grid-area: slope;
+  width: 74px;
+  height: 36px;
+  overflow: visible;
+}
+.op-rail { stroke: var(--hair-strong); stroke-width: 1; }
+.op-line {
+  stroke-width: 1.6;
+  opacity: 0.6;
+  transition: opacity var(--dur-touch) var(--ease-soft),
+              stroke-width var(--dur-touch) var(--ease-soft);
+}
+.opening:hover .op-line { opacity: 1; stroke-width: 2.2; }
+
+.dip-header .dip-name-btn { animation: sub-from-left var(--dur-scene) var(--ease-settle) both; }
+.dip-header .dip-name-btn.right { animation-name: sub-from-right; }
+
+.dip-vs { animation: sub-settle var(--dur-enter) var(--ease-settle) both 380ms; }
+.dip-closeness { animation: sub-fade var(--dur-enter) var(--ease-soft) both 480ms; }
+
+.dip-row { animation: sub-rise var(--dur-enter) var(--ease-settle) both; }
+.dip-row:nth-of-type(1) { animation-delay: 520ms }
+.dip-row:nth-of-type(2) { animation-delay: 600ms }
+.dip-row:nth-of-type(3) { animation-delay: 680ms }
+.dip-row:nth-of-type(n+4) { animation-delay: 750ms }
+
+.dip-cols > .dip-col:first-child,
+.dip-effect-cols > .dip-effect-col:first-child {
+  animation: sub-from-left var(--dur-enter) var(--ease-settle) both 60ms;
+}
+.dip-cols > .dip-col:last-child,
+.dip-effect-cols > .dip-effect-col:last-child {
+  animation: sub-from-right var(--dur-enter) var(--ease-settle) both 60ms;
+}
+
+.dip-effect-cols > .dip-effect-col.shared {
+  animation: sub-settle var(--dur-enter) var(--ease-settle) both 200ms;
+}
+
+.dip-restart { animation: sub-fade var(--dur-enter) var(--ease-soft) both 820ms; }
+
+.diptych-setup > .eyebrow { animation: sub-fade var(--dur-shift) var(--ease-soft) both; }
+.dip-title { animation: sub-rise var(--dur-enter) var(--ease-settle) both 70ms; }
+.picker-row { animation: sub-rise var(--dur-enter) var(--ease-settle) both 150ms; }
+
+.picker-row { position: relative; z-index: 5; }
+.openings { position: relative; z-index: 1; }
+
+.picker-hits {
+  background: var(--raised-2);
+  backdrop-filter: blur(10px);
 }

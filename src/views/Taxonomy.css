@@ -99,3 +99,35 @@
   color: var(--faint);
   font-variant-numeric: tabular-nums;
 }
+
+.tax-header { animation: sub-rise var(--dur-enter) var(--ease-settle) both; }
+.tax-sub { animation: sub-rise var(--dur-enter) var(--ease-settle) both 80ms; }
+.tax-search { animation: sub-rise var(--dur-enter) var(--ease-settle) both 150ms; }
+
+.tax-section { animation: sub-fade var(--dur-enter) var(--ease-soft) both; }
+.tax-section:nth-of-type(1) { animation-delay: 200ms }
+.tax-section:nth-of-type(2) { animation-delay: 300ms }
+.tax-section:nth-of-type(3) { animation-delay: 400ms }
+.tax-section:nth-of-type(n+4) { animation-delay: 470ms }
+
+.tax-section-head { animation: sub-from-left var(--dur-enter) var(--ease-settle) both; }
+
+.tax-card { animation: sub-settle var(--dur-shift) var(--ease-settle) both; }
+.tax-card:nth-child(1) { animation-delay: 0ms }
+.tax-card:nth-child(2) { animation-delay: 26ms }
+.tax-card:nth-child(3) { animation-delay: 52ms }
+.tax-card:nth-child(4) { animation-delay: 78ms }
+.tax-card:nth-child(5) { animation-delay: 104ms }
+.tax-card:nth-child(6) { animation-delay: 130ms }
+.tax-card:nth-child(7) { animation-delay: 156ms }
+.tax-card:nth-child(8) { animation-delay: 182ms }
+.tax-card:nth-child(n+9) { animation-delay: 200ms }
+
+.tax-card {
+  transition: border-color var(--dur-touch) var(--ease-soft),
+              background-color var(--dur-touch) var(--ease-soft),
+              transform var(--dur-shift) var(--ease-settle);
+}
+.tax-card:hover { transform: translateY(-2px); }
+.tax-card-dot { transition: transform var(--dur-shift) var(--ease-settle); }
+.tax-card:hover .tax-card-dot { transform: scale(1.4); }

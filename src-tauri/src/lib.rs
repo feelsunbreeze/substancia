@@ -1,17 +1,30 @@
+mod data_key;
+pub mod licensing;
+
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
+use aes_gcm::aead::{Aead, KeyInit};
+use aes_gcm::{Aes256Gcm, Nonce};
 use serde::Serialize;
 use serde_json::Value;
 
-// Data is baked into the binary at compile time — no resource-path juggling,
-// works identically in dev and in a bundled release.
-const ATLAS_RAW: &str = include_str!("../data/atlas.json");
-const SUBSTANCES_RAW: &str = include_str!("../data/substances.json");
-const EFFECTS_RAW: &str = include_str!("../data/effects.json");
-const CATEGORIES_RAW: &str = include_str!("../data/categories.json");
-const NEURO_RAW: &str = include_str!("../data/neuro.json");
-const BIPARTITE_RAW: &str = include_str!("../data/bipartite.json");
+const ATLAS_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/atlas.json.enc"));
+const SUBSTANCES_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/substances.json.enc"));
+const EFFECTS_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/effects.json.enc"));
+const CATEGORIES_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/categories.json.enc"));
+const NEURO_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/neuro.json.enc"));
+const BIPARTITE_ENC: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/bipartite.json.enc"));
+
+fn decrypt(bytes: &[u8]) -> String {
+    let (nonce_bytes, ciphertext) = bytes.split_at(12);
+    let cipher = Aes256Gcm::new_from_slice(&data_key::DATA_KEY).expect("32-byte key");
+    let nonce = Nonce::from_slice(nonce_bytes);
+    let plain = cipher
+        .decrypt(nonce, ciphertext)
+        .expect("embedded dataset failed to decrypt — the binary may be corrupted");
+    String::from_utf8(plain).expect("dataset is valid UTF-8")
+}
 
 static ATLAS: OnceLock<Value> = OnceLock::new();
 static ATLAS_INDEX: OnceLock<HashMap<String, Value>> = OnceLock::new();
@@ -23,7 +36,7 @@ static BIPARTITE_ROOT: OnceLock<Value> = OnceLock::new();
 static BIPARTITE: OnceLock<HashMap<String, Value>> = OnceLock::new();
 
 fn atlas() -> &'static Value {
-    ATLAS.get_or_init(|| serde_json::from_str(ATLAS_RAW).expect("atlas.json parse"))
+    ATLAS.get_or_init(|| serde_json::from_str(&decrypt(ATLAS_ENC)).expect("atlas.json parse"))
 }
 
 fn atlas_index() -> &'static HashMap<String, Value> {
@@ -41,23 +54,23 @@ fn atlas_index() -> &'static HashMap<String, Value> {
 }
 
 fn substances() -> &'static HashMap<String, Value> {
-    SUBSTANCES.get_or_init(|| serde_json::from_str(SUBSTANCES_RAW).expect("substances.json parse"))
+    SUBSTANCES.get_or_init(|| serde_json::from_str(&decrypt(SUBSTANCES_ENC)).expect("substances.json parse"))
 }
 
 fn effects() -> &'static HashMap<String, Value> {
-    EFFECTS.get_or_init(|| serde_json::from_str(EFFECTS_RAW).expect("effects.json parse"))
+    EFFECTS.get_or_init(|| serde_json::from_str(&decrypt(EFFECTS_ENC)).expect("effects.json parse"))
 }
 
 fn categories() -> &'static HashMap<String, Value> {
-    CATEGORIES.get_or_init(|| serde_json::from_str(CATEGORIES_RAW).expect("categories.json parse"))
+    CATEGORIES.get_or_init(|| serde_json::from_str(&decrypt(CATEGORIES_ENC)).expect("categories.json parse"))
 }
 
 fn neuro() -> &'static HashMap<String, Value> {
-    NEURO.get_or_init(|| serde_json::from_str(NEURO_RAW).expect("neuro.json parse"))
+    NEURO.get_or_init(|| serde_json::from_str(&decrypt(NEURO_ENC)).expect("neuro.json parse"))
 }
 
 fn bipartite_root() -> &'static Value {
-    BIPARTITE_ROOT.get_or_init(|| serde_json::from_str(BIPARTITE_RAW).expect("bipartite.json parse"))
+    BIPARTITE_ROOT.get_or_init(|| serde_json::from_str(&decrypt(BIPARTITE_ENC)).expect("bipartite.json parse"))
 }
 
 fn bipartite() -> &'static HashMap<String, Value> {
@@ -70,54 +83,62 @@ fn bipartite() -> &'static HashMap<String, Value> {
     })
 }
 
-/// The Firmament: every mapped substance with coords, class, neighbours, signature effects.
-#[tauri::command]
-fn get_atlas() -> Value {
-    atlas().clone()
+const UNLICENSED: &str = "unlicensed";
+
+fn require_license() -> Result<(), String> {
+    if licensing::is_licensed() {
+        Ok(())
+    } else {
+        Err(UNLICENSED.to_string())
+    }
 }
 
-/// A single Specimen: the full scraped record merged with its atlas node
-/// (coordinates, nearest kin, signature effects) so the page needs one call.
 #[tauri::command]
-fn get_substance(name: String) -> Option<Value> {
-    let mut record = substances().get(&name)?.clone();
+fn get_atlas() -> Result<Value, String> {
+    require_license()?;
+    Ok(atlas().clone())
+}
+
+#[tauri::command]
+fn get_substance(name: String) -> Result<Option<Value>, String> {
+    require_license()?;
+    let Some(mut record) = substances().get(&name).cloned() else {
+        return Ok(None);
+    };
     if let (Some(obj), Some(node)) = (record.as_object_mut(), atlas_index().get(&name)) {
         obj.insert("atlas".to_string(), node.clone());
     }
-    Some(record)
+    Ok(Some(record))
 }
 
-/// A single effect from the Subjective Effect Index: canonical description
-/// plus every substance in the codex known to induce it.
 #[tauri::command]
-fn get_effect(name: String) -> Option<Value> {
-    effects().get(&name).cloned()
+fn get_effect(name: String) -> Result<Option<Value>, String> {
+    require_license()?;
+    Ok(effects().get(&name).cloned())
 }
 
-/// The full effect taxonomy — used by the Sensorium's browse-by-category view.
 #[tauri::command]
-fn list_effects() -> Vec<Value> {
-    effects().values().cloned().collect()
+fn list_effects() -> Result<Vec<Value>, String> {
+    require_license()?;
+    Ok(effects().values().cloned().collect())
 }
 
-/// Every substance name that has a plate — so the UI can tell which
-/// interaction references (e.g. "Lithium", "SSRIs") are dead ends.
 #[tauri::command]
-fn substance_names() -> Vec<String> {
-    substances().keys().cloned().collect()
+fn substance_names() -> Result<Vec<String>, String> {
+    require_license()?;
+    Ok(substances().keys().cloned().collect())
 }
 
-/// A single class page (definition + members).
 #[tauri::command]
-fn get_category(name: String) -> Option<Value> {
-    categories().get(&name).cloned()
+fn get_category(name: String) -> Result<Option<Value>, String> {
+    require_license()?;
+    Ok(categories().get(&name).cloned())
 }
 
-/// Every class page, minus the (potentially large) prose blocks — the
-/// Taxonomy explorer only needs name/kind/member-count to lay out its grid.
 #[tauri::command]
-fn list_categories() -> Vec<Value> {
-    categories()
+fn list_categories() -> Result<Vec<Value>, String> {
+    require_license()?;
+    Ok(categories()
         .values()
         .map(|c| {
             let mut slim = c.clone();
@@ -126,14 +147,13 @@ fn list_categories() -> Vec<Value> {
             }
             slim
         })
-        .collect()
+        .collect())
 }
 
-/// A substance's fuzzy neurotransmitter/receptor-target profile, extracted
-/// from Pharmacology prose (targets + per-system aggregate scores).
 #[tauri::command]
-fn get_neuro(name: String) -> Option<Value> {
-    neuro().get(&name).cloned()
+fn get_neuro(name: String) -> Result<Option<Value>, String> {
+    require_license()?;
+    Ok(neuro().get(&name).cloned())
 }
 
 fn systems_of(name: &str) -> HashMap<String, f64> {
@@ -161,10 +181,9 @@ struct SystemRow {
     b: f64,
 }
 
-/// Fuzzy cosine similarity between two substances' neurotransmitter-system
-/// vectors, plus the per-system scores side by side for the Diptych.
 #[tauri::command]
-fn compare_neuro(a: String, b: String) -> NeuroCompare {
+fn compare_neuro(a: String, b: String) -> Result<NeuroCompare, String> {
+    require_license()?;
     let sa = systems_of(&a);
     let sb = systems_of(&b);
     let mut keys: Vec<String> = sa.keys().chain(sb.keys()).cloned().collect();
@@ -185,33 +204,27 @@ fn compare_neuro(a: String, b: String) -> NeuroCompare {
     }
     let similarity = if na > 0.0 && nb > 0.0 { dot / (na.sqrt() * nb.sqrt()) } else { 0.0 };
     rows.sort_by(|r1, r2| (r1.a.abs() + r1.b.abs()).partial_cmp(&(r2.a.abs() + r2.b.abs())).unwrap().reverse());
-    NeuroCompare { similarity, systems: rows }
+    Ok(NeuroCompare { similarity, systems: rows })
 }
 
-/// A substance's projected "binds-alike" graph neighborhood (cosine similarity
-/// over fine-grained receptor/transporter targets) plus its divergence from
-/// the "feels-alike" effect-similarity graph — where two drugs feel similar
-/// but bind very differently, or vice versa.
 #[tauri::command]
-fn get_bipartite(name: String) -> Option<Value> {
-    bipartite().get(&name).cloned()
+fn get_bipartite(name: String) -> Result<Option<Value>, String> {
+    require_license()?;
+    Ok(bipartite().get(&name).cloned())
 }
 
-/// Global top divergent pairs across the whole dataset, ranked by
-/// |effect_similarity - target_similarity|.
 #[tauri::command]
-fn top_divergent() -> Value {
-    bipartite_root()
+fn top_divergent() -> Result<Value, String> {
+    require_license()?;
+    Ok(bipartite_root()
         .get("top_divergent")
         .cloned()
-        .unwrap_or_else(|| Value::Array(Vec::new()))
+        .unwrap_or_else(|| Value::Array(Vec::new())))
 }
 
-/// Resolution tables so the UI can turn an interaction reference into a link:
-/// { substances: {alias->canonical}, categories: {alias->display} }.
-/// Aliases are lowercased.
 #[tauri::command]
-fn link_map() -> Value {
+fn link_map() -> Result<Value, String> {
+    require_license()?;
     let mut sub_alias = serde_json::Map::new();
     for (name, rec) in substances() {
         sub_alias.insert(name.to_lowercase(), Value::String(name.clone()));
@@ -234,25 +247,24 @@ fn link_map() -> Value {
             }
         }
     }
-    serde_json::json!({ "substances": sub_alias, "categories": cat_alias })
+    Ok(serde_json::json!({ "substances": sub_alias, "categories": cat_alias }))
 }
 
 #[derive(Serialize)]
 struct SearchHit {
-    kind: &'static str, // "substance" | "effect"
+    kind: &'static str,
     name: String,
     category: String,
     subcategory: String,
     mapped: bool,
 }
 
-/// The Register: prefix/substring search across every substance AND effect,
-/// ranked so that name-start matches surface first.
 #[tauri::command]
-fn search(query: String) -> Vec<SearchHit> {
+fn search(query: String) -> Result<Vec<SearchHit>, String> {
+    require_license()?;
     let q = query.trim().to_lowercase();
     if q.is_empty() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
     let idx = atlas_index();
     let mut hits: Vec<(u8, SearchHit)> = Vec::new();
@@ -332,7 +344,7 @@ fn search(query: String) -> Vec<SearchHit> {
                 .map(|a| !a.is_empty())
                 .unwrap_or(false);
             hits.push((
-                rank + 1, // effects rank just below substance ties at the same tier
+                rank + 1,
                 SearchHit {
                     kind: "effect",
                     name: name.clone(),
@@ -378,7 +390,40 @@ fn search(query: String) -> Vec<SearchHit> {
     }
 
     hits.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.name.cmp(&b.1.name)));
-    hits.into_iter().take(40).map(|(_, h)| h).collect()
+    Ok(hits.into_iter().take(40).map(|(_, h)| h).collect())
+}
+
+#[derive(Serialize)]
+struct LicenseStatus {
+    valid: bool,
+    machine_id: String,
+    licensee: Option<String>,
+    email: Option<String>,
+    tier: Option<String>,
+    expires: Option<String>,
+}
+
+fn license_status() -> LicenseStatus {
+    let payload = licensing::current_payload();
+    LicenseStatus {
+        valid: payload.is_some(),
+        machine_id: licensing::machine_id(),
+        licensee: payload.as_ref().map(|p| p.licensee.clone()),
+        email: payload.as_ref().map(|p| p.email.clone()),
+        tier: payload.as_ref().map(|p| p.tier.clone()),
+        expires: payload.as_ref().and_then(|p| p.expires.clone()),
+    }
+}
+
+#[tauri::command]
+fn get_license_status() -> LicenseStatus {
+    license_status()
+}
+
+#[tauri::command]
+fn install_license(license_text: String) -> Result<LicenseStatus, String> {
+    licensing::install(&license_text)?;
+    Ok(license_status())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -398,7 +443,9 @@ pub fn run() {
             get_bipartite,
             top_divergent,
             link_map,
-            search
+            search,
+            get_license_status,
+            install_license
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

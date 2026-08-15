@@ -5,7 +5,6 @@
   --pig: var(--effect-accent);
 }
 
-/* the header deliberately reads differently from a Specimen — a class, not a thing */
 .cat-header {
   text-align: center;
   padding-bottom: clamp(24px, 4vw, 40px);
@@ -118,3 +117,24 @@
     margin-top: 24px;
   }
 }
+
+.cat-header { animation: sub-fade var(--dur-shift) var(--ease-soft) both; }
+.cat-name { animation: sub-rise var(--dur-enter) var(--ease-settle) both 60ms; }
+.cat-aliases { animation: sub-rise var(--dur-enter) var(--ease-settle) both 140ms; }
+.cat-column { animation: sub-rise var(--dur-enter) var(--ease-settle) both 200ms; }
+
+.cat-members > h3 { animation: sub-fade var(--dur-enter) var(--ease-soft) both 260ms; }
+.cat-group { animation: sub-rise var(--dur-enter) var(--ease-settle) both; }
+.cat-group:nth-of-type(1) { animation-delay: 300ms }
+.cat-group:nth-of-type(2) { animation-delay: 360ms }
+.cat-group:nth-of-type(3) { animation-delay: 420ms }
+.cat-group:nth-of-type(n+4) { animation-delay: 470ms }
+
+.cat-chip { animation: sub-settle var(--dur-shift) var(--ease-settle) both; }
+.cat-chip:nth-child(1) { animation-delay: 320ms }
+.cat-chip:nth-child(2) { animation-delay: 344ms }
+.cat-chip:nth-child(3) { animation-delay: 368ms }
+.cat-chip:nth-child(4) { animation-delay: 392ms }
+.cat-chip:nth-child(5) { animation-delay: 416ms }
+.cat-chip:nth-child(6) { animation-delay: 440ms }
+.cat-chip:nth-child(n+7) { animation-delay: 464ms }

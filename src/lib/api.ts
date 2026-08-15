@@ -1,7 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
 
-// ——— types mirroring the Rust backend / scraped records ———
-
 export interface Neighbor {
   name: string;
   score: number;
@@ -18,11 +16,27 @@ export interface AtlasNode {
   signature_effects: string[];
   effect_count: number;
   neighbors: Neighbor[];
+  community: number;
+  axes: Record<string, number>;
+}
+
+export interface EffectAxes {
+  order: string[];
+  scale: Record<string, number>;
+}
+
+export interface Community {
+  id: number;
+  size: number;
+  members: string[];
+  signature_effects: string[];
 }
 
 export interface Atlas {
   vocab_size: number;
   substances: AtlasNode[];
+  communities: Community[];
+  effect_axes: EffectAxes;
 }
 
 export interface Range {
@@ -50,8 +64,6 @@ export interface EffectItem {
   description: string;
 }
 
-// Prose is delivered as typed blocks so the reader gets an annotated field
-// guide, not a wall of flattened text.
 export type Block =
   | { type: "p"; text: string }
   | { type: "h3"; text: string }
@@ -68,7 +80,6 @@ export interface Substance {
   summaryHazard: boolean;
   class: { chemical: string[] | null; psychoactive: string[] | null } | null;
   tolerance: { full: string | null; half: string | null; zero: string | null } | null;
-  effects: { name: string; url: string | null }[];
   roas: Roa[] | null;
   dangerousInteractions: { name: string }[] | null;
   unsafeInteractions: { name: string }[] | null;
@@ -125,7 +136,7 @@ export interface Category {
 export interface NeuroTarget {
   code: string;
   system: string;
-  score: number; // -1 (antagonist/blocking) .. +1 (strong agonist/releaser)
+  score: number;
   mentions: number;
 }
 
@@ -147,14 +158,14 @@ export interface NeuroCompare {
 
 export interface BindNeighbor {
   name: string;
-  score: number; // cosine similarity over fine-grained receptor/transporter targets
+  score: number;
 }
 
 export interface DivergenceRow {
   name: string;
   effect_sim: number;
   target_sim: number;
-  divergence: number; // effect_sim - target_sim; positive = feels alike but binds differently
+  divergence: number;
 }
 
 export interface BipartiteProfile {
@@ -172,18 +183,14 @@ export interface DivergentPair {
 }
 
 export interface LinkMap {
-  substances: Record<string, string>; // lowercased alias -> canonical substance
-  categories: Record<string, string>; // lowercased alias -> category display name
+  substances: Record<string, string>;
+  categories: Record<string, string>;
 }
 
 export type Reference =
   | { kind: "substance"; name: string }
   | { kind: "category"; name: string }
   | { kind: "none"; name: string };
-
-// ——— backend commands ———
-// In the Tauri window these hit the Rust backend. In a plain browser (UI dev /
-// preview) they fall back to the same JSON served statically — identical shapes.
 
 const inTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
@@ -221,6 +228,15 @@ async function devBipartite() {
 
 export const getAtlas = (): Promise<Atlas> => (inTauri ? invoke<Atlas>("get_atlas") : devAtlas());
 
+let atlasIndexCache: Map<string, AtlasNode> | null = null;
+export const atlasIndex = async (): Promise<Map<string, AtlasNode>> => {
+  if (!atlasIndexCache) {
+    const atlas = await getAtlas();
+    atlasIndexCache = new Map(atlas.substances.map((s) => [s.name, s]));
+  }
+  return atlasIndexCache;
+};
+
 export const getEffect = async (name: string): Promise<Effect | null> => {
   if (inTauri) return invoke<Effect | null>("get_effect", { name });
   const effs = await devEffects();
@@ -234,7 +250,6 @@ export const listEffects = async (): Promise<Effect[]> => {
 };
 
 let nameSetCache: Set<string> | null = null;
-/** Names that have a Specimen plate — lets the UI avoid dead-end links. */
 export const substanceNameSet = async (): Promise<Set<string>> => {
   if (nameSetCache) return nameSetCache;
   const names = inTauri
@@ -320,17 +335,13 @@ async function getLinkMap(): Promise<LinkMap> {
   return linkMapCache;
 }
 
-/** Build a synchronous resolver once the link map is loaded. */
 export async function makeResolver(): Promise<(subject: string) => Reference> {
   const map = await getLinkMap();
   return (subject: string): Reference => {
     const raw = subject.trim();
     const k = raw.toLowerCase();
-    // substance first (aliases like DXM -> Dextromethorphan)
     if (map.substances[k]) return { kind: "substance", name: map.substances[k] };
-    // then category (SSRIs, MAOIs, Psychedelics …)
     if (map.categories[k]) return { kind: "category", name: map.categories[k] };
-    // tolerate a trailing plural "s"
     const singular = k.endsWith("s") ? k.slice(0, -1) : k;
     if (map.substances[singular]) return { kind: "substance", name: map.substances[singular] };
     if (map.categories[singular]) return { kind: "category", name: map.categories[singular] };
@@ -419,8 +430,6 @@ export const search = async (query: string): Promise<SearchHit[]> => {
   return scored.slice(0, 40).map(([, h]) => h);
 };
 
-// ——— pigment class-coding (mirrors theme.css tokens) ———
-
 const PIGMENT_VAR: Record<string, string> = {
   Psychedelic: "--psychedelic",
   Dissociatives: "--dissociatives",
@@ -442,20 +451,40 @@ const PIGMENT_VAR: Record<string, string> = {
 
 function pigmentVarName(category: string): string {
   if (PIGMENT_VAR[category]) return PIGMENT_VAR[category];
-  // class pages are named in the plural ("Psychedelics"); atlas/pigment
-  // keys use the GraphQL singular ("Psychedelic") — tolerate either.
   const singular = category.endsWith("s") ? category.slice(0, -1) : category;
   return PIGMENT_VAR[singular] ?? "--uncategorized";
 }
 
-/** CSS var() reference for a class — resolves live to the current theme. */
 export function pigment(category: string): string {
   return `var(${pigmentVarName(category)})`;
 }
 
-/** Resolved hex for canvas drawing (canvas can't read CSS vars directly). */
 export function pigmentHex(category: string): string {
   const varName = pigmentVarName(category);
   const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   return val || "#9A9488";
 }
+
+export interface LicenseStatus {
+  valid: boolean;
+  machine_id: string;
+  licensee: string | null;
+  email: string | null;
+  tier: string | null;
+  expires: string | null;
+}
+
+const DEV_STATUS: LicenseStatus = {
+  valid: true,
+  machine_id: "dev-browser",
+  licensee: "Development build",
+  email: null,
+  tier: "dev",
+  expires: null,
+};
+
+export const getLicenseStatus = (): Promise<LicenseStatus> =>
+  inTauri ? invoke<LicenseStatus>("get_license_status") : Promise.resolve(DEV_STATUS);
+
+export const installLicense = (licenseText: string): Promise<LicenseStatus> =>
+  inTauri ? invoke<LicenseStatus>("install_license", { licenseText }) : Promise.resolve(DEV_STATUS);
