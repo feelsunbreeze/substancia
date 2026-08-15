@@ -1,7 +1,7 @@
 [package]
 name = "substancia"
-version = "0.1.0"
-description = "A Tauri App"
+version = "1.0.0"
+description = "A field guide to how psychoactive substances feel"
 authors = ["you"]
 edition = "2021"
 

@@ -27,7 +27,7 @@ Substancia is a full pharmacology reference desktop app — dose ranges, duratio
 
 It's not a wiki mirror. It's a purpose-built visual interface: specimens are placed in **the Firmament** by how similar their subjective effects are, so you can explore by *feeling*, not by alphabetical drug class. Compare any two specimens side by side. See nearest kin by shared effects, and by shared receptor targets — and where the two disagree.
 
-Reference material, not advice. Fully free, no paywalled tier, nothing held back.
+Fully free, no paywalled tier, nothing held back.
 
 ---
 
@@ -40,6 +40,27 @@ Reference material, not advice. Fully free, no paywalled tier, nothing held back
 - **⚖️ Compare (Diptych)** — side-by-side comparison of any two specimens.
 - **🗂️ Taxonomy** — browse every drug class directly.
 - **🔒 Fully local** — no account, no telemetry, no network calls beyond loading the bundled dataset.
+
+---
+
+## 🖼 UI Showcase
+
+<div align="center">
+
+<img src="docs/screenshots/firmament.png" width="90%" alt="The Firmament — specimens placed by effect similarity" />
+<br /><sub><b>The Firmament</b> — 288 specimens placed by how similar their subjective effects are.</sub>
+
+<br /><br />
+
+<img src="docs/screenshots/specimen.png" width="90%" alt="A specimen plate with dosing, arc, and cited prose" />
+<br /><sub><b>Specimen plate</b> — dosing, the duration arc, tolerance, neurochemistry, hazard callouts, and cited prose.</sub>
+
+<br /><br />
+
+<img src="docs/screenshots/diptych.png" width="90%" alt="Side-by-side comparison of two specimens" />
+<br /><sub><b>Diptych</b> — any two specimens, side by side.</sub>
+
+</div>
 
 ---
 
@@ -100,18 +121,18 @@ Substancia is open source under the GPL — forks and derivatives stay open, too
 
 ## ☕ Support
 
-Substancia is free, open-source, and maintained because the reference material deserves to exist without a paywall. If it's been useful to you, a Ko-fi goes a long way:
+Substancia will always be free. No paywalled tier, no "premium" specimens, no ads, no telemetry sold to anyone — every specimen, every feature, for everyone, forever.
+
+That only works if it's sustainable. Compiling and cleaning a 288-specimen dataset, building the visual layer on top of it, and keeping it maintained across Windows, macOS, and Linux is real, ongoing work — and every dollar from Ko-fi goes straight back into keeping it free for the next person who needs it, instead of putting a price tag on the app itself.
+
+If Substancia has been useful to you — saved you a dangerous combo, answered a question a hospital pamphlet wouldn't, or just been a nicer way to learn — consider chipping in what a coffee costs. It adds up, and it's the only thing standing between this project and a paywall:
 
 [![Support on Ko-fi](https://img.shields.io/badge/Support%20on-Ko--fi-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=fff)](https://ko-fi.com/feelsunbreeze)
+
+Companies and orgs are welcome to sponsor too — see [the website](#) for sponsorship details.
 
 ---
 
 ## 📄 License
 
 GPL-3.0 © [feelsunbreeze](https://github.com/feelsunbreeze) — see [LICENSE](LICENSE).
-
----
-
-<div align="center">
-  <sub>Reference material, not advice.</sub>
-</div>
