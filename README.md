@@ -47,17 +47,17 @@ Fully free, no paywalled tier, nothing held back.
 
 <div align="center">
 
-<img src="docs/screenshots/firmament.png" width="90%" alt="The Firmament — specimens placed by effect similarity" />
+<img src="web/screenshots/firmament.png" width="90%" alt="The Firmament — specimens placed by effect similarity" />
 <br /><sub><b>The Firmament</b> — 288 specimens placed by how similar their subjective effects are.</sub>
 
 <br /><br />
 
-<img src="docs/screenshots/specimen.png" width="90%" alt="A specimen plate with dosing, arc, and cited prose" />
+<img src="web/screenshots/specimen.png" width="90%" alt="A specimen plate with dosing, arc, and cited prose" />
 <br /><sub><b>Specimen plate</b> — dosing, the duration arc, tolerance, neurochemistry, hazard callouts, and cited prose.</sub>
 
 <br /><br />
 
-<img src="docs/screenshots/diptych.png" width="90%" alt="Side-by-side comparison of two specimens" />
+<img src="web/screenshots/diptych.png" width="90%" alt="Side-by-side comparison of two specimens" />
 <br /><sub><b>Diptych</b> — any two specimens, side by side.</sub>
 
 </div>
