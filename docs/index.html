@@ -29,7 +29,7 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme="light"]):not([data-theme="obsidian"]) {
       --ground: #090A0F;
       --raised: #0F1117;
       --raised-2: #161921;
@@ -58,6 +58,36 @@
     --accent: #C9AE6B;
     --danger: #DB6558;
     --danger-tint: color-mix(in srgb, var(--danger) 12%, transparent);
+  }
+
+  :root[data-theme="obsidian"] {
+    --ground: #000000;
+    --raised: #08080B;
+    --raised-2: #101116;
+    --ink: #E8E4D8;
+    --muted: #949CA8;
+    --faint: #636A76;
+    --hair: #16181F;
+    --hair-strong: #2C313D;
+    --field: #000000;
+    --accent: #C9AE6B;
+    --danger: #DB6558;
+    --danger-tint: color-mix(in srgb, var(--danger) 12%, transparent);
+  }
+
+  :root[data-theme="light"] {
+    --ground: #E9E7DD;
+    --raised: #F1EFE6;
+    --raised-2: #DEDBCE;
+    --ink: #1A1D22;
+    --muted: #5C636C;
+    --faint: #8A9099;
+    --hair: #CBC7BA;
+    --hair-strong: #B3AEA0;
+    --field: #E4E1D4;
+    --accent: #8F7233;
+    --danger: #C0392B;
+    --danger-tint: color-mix(in srgb, var(--danger) 9%, transparent);
   }
 
   * { box-sizing: border-box; }
@@ -301,6 +331,32 @@
   }
   .tier-note a { color: var(--accent); }
 
+  /* ---------- theme switcher ---------- */
+  .theme-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--raised) 82%, transparent);
+    border: 1px solid var(--hair);
+    backdrop-filter: blur(8px);
+  }
+  .theme-swatch-btn {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--hair-strong);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
+  }
+  .theme-swatch-btn:hover { transform: scale(1.12); }
+  .theme-swatch-btn[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+
   /* ---------- footer ---------- */
   footer { padding: 44px 0 60px; }
   .foot-row {
@@ -328,6 +384,12 @@
 </head>
 <body>
 
+
+<div class="theme-switch" role="group" aria-label="Theme">
+  <button class="theme-swatch-btn" data-theme-btn="dark" title="Nocturne — ink-black, blue undertone" style="background:#0F1117"></button>
+  <button class="theme-swatch-btn" data-theme-btn="obsidian" title="Obsidian — true black" style="background:#08080B"></button>
+  <button class="theme-swatch-btn" data-theme-btn="light" title="Vellum — paper and pigment" style="background:#F1EFE6"></button>
+</div>
 
 <div class="wrap hero">
   <div class="hero-eyebrow eyebrow">SPECIMEN 001&ndash;288 &middot; free &amp; open source &middot; no paywall</div>
@@ -501,6 +563,28 @@
 </footer>
 
 <script>
+  (function () {
+    var STORAGE_KEY = 'substancia-site-theme';
+    var btns = document.querySelectorAll('[data-theme-btn]');
+    function applyTheme(t) {
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      else document.documentElement.removeAttribute('data-theme');
+      btns.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-theme-btn') === t));
+      });
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    applyTheme(saved || 'dark');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-theme-btn');
+        applyTheme(t);
+        try { localStorage.setItem(STORAGE_KEY, t); } catch (e) {}
+      });
+    });
+  })();
+
   var els = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
