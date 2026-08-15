@@ -125,8 +125,46 @@
 
   /* ---------- Hero ---------- */
   .hero {
+    position: relative;
     padding: clamp(72px, 14vh, 140px) 0 clamp(56px, 10vh, 96px);
     border-bottom: 1px solid var(--hair);
+    overflow: hidden;
+  }
+  .hero-content { position: relative; z-index: 2; }
+
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .float-icon {
+    position: absolute;
+    color: var(--hair-strong);
+    opacity: 0.55;
+    will-change: translate, transform;
+    animation: icon-drift var(--drift-dur, 11s) ease-in-out infinite alternate;
+    animation-delay: var(--drift-delay, 0s);
+    transform-origin: 50% 50%;
+    /* .transform (mouse parallax, set via JS) composes with the animated .translate/.rotate below */
+    transform: translate(var(--parallax-x, 0px), var(--parallax-y, 0px));
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .float-icon.accent { color: var(--accent); opacity: 0.4; }
+  .float-icon svg { display: block; }
+
+  @keyframes icon-drift {
+    0%   { translate: 0 0; rotate: 0deg; }
+    50%  { translate: var(--drift-x, 10px) var(--drift-y, -14px); rotate: var(--drift-rot, 4deg); }
+    100% { translate: calc(var(--drift-x, 10px) * -0.6) calc(var(--drift-y, -14px) * 0.4); rotate: calc(var(--drift-rot, 4deg) * -1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float-icon { animation: none; }
+  }
+
+  @media (max-width: 780px) {
+    .hero-field { display: none; }
   }
   .hero-eyebrow { margin-bottom: 22px; }
   .hero h1 {
@@ -385,6 +423,8 @@
 <body>
 
 
+
+
 <div class="theme-switch" role="group" aria-label="Theme">
   <button class="theme-swatch-btn" data-theme-btn="dark" title="Nocturne — ink-black, blue undertone" style="background:#0F1117"></button>
   <button class="theme-swatch-btn" data-theme-btn="obsidian" title="Obsidian — true black" style="background:#08080B"></button>
@@ -392,21 +432,50 @@
 </div>
 
 <div class="wrap hero">
-  <div class="hero-eyebrow eyebrow">SPECIMEN 001&ndash;288 &middot; free &amp; open source &middot; no paywall</div>
-  <h1>A field guide<br />to how it feels.</h1>
-  <p class="hero-sub">Substancia maps <b>288 psychoactive substances</b> by how their subjective effects feel &mdash; not by chemistry, not by class &mdash; with dosing, pharmacology, interactions, and cited sources for every one of them.</p>
-  <div class="cta-row">
-    <a class="btn btn-primary" href="https://github.com/feelsunbreeze/substancia/releases/latest">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5v8.4M8 1.5 4.6 4.9M8 1.5l3.4 3.4M2.5 11v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Download
-    </a>
-    <a class="btn btn-ghost" href="https://github.com/feelsunbreeze/substancia">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-      View on GitHub
-    </a>
+  <div class="hero-field" aria-hidden="true">
+    <!-- benzene ring -->
+    <span class="float-icon" data-depth="0.5" style="top:14%; left:64%; --drift-x:-14px; --drift-y:16px; --drift-rot:-6deg; --drift-dur:13s; --drift-delay:0s;">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M12 2.5 20 7v10l-8 4.5L4 17V7l8-4.5Z"/><path d="M12 2.5v4.2M20 7l-3.6 2.1M20 17l-3.6-2.1M12 21.5v-4.2M4 17l3.6-2.1M4 7l3.6 2.1" opacity="0.55"/></svg>
+    </span>
+    <!-- molecule -->
+    <span class="float-icon" data-depth="0.8" style="top:62%; left:71%; --drift-x:12px; --drift-y:-18px; --drift-rot:8deg; --drift-dur:9.5s; --drift-delay:0.6s;">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="6" r="1.8"/><circle cx="16" cy="17" r="2.6"/><path d="M8.1 8.2 14 15.3M8 6.4l8.2-0.3"/></svg>
+    </span>
+    <!-- capsule -->
+    <span class="float-icon" data-depth="0.3" style="top:8%; left:85%; --drift-x:-8px; --drift-y:12px; --drift-rot:14deg; --drift-dur:12s; --drift-delay:1.1s;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="9" width="19" height="6" rx="3" transform="rotate(-28 12 12)"/><path d="M11 8.3 13 15.7" stroke-dasharray="0.5 2.2" transform="rotate(-28 12 12)"/></svg>
+    </span>
+    <!-- mortar & pestle -->
+    <span class="float-icon" data-depth="0.4" style="top:78%; left:52%; --drift-x:10px; --drift-y:10px; --drift-rot:-5deg; --drift-dur:14s; --drift-delay:0.3s;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 13a7 5 0 0 0 14 0"/><path d="M4 13h16"/><path d="M9 12 15.5 4.5" stroke-linecap="round"/><circle cx="16.3" cy="3.6" r="1.15" fill="currentColor" stroke="none"/></svg>
+    </span>
+    <!-- flask -->
+    <span class="float-icon" data-depth="0.6" style="top:38%; left:90%; --drift-x:-10px; --drift-y:-12px; --drift-rot:6deg; --drift-dur:10.5s; --drift-delay:0.85s;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9.5 3h5M10.3 3v5.4L5.6 17a2.4 2.4 0 0 0 2.1 3.6h8.6a2.4 2.4 0 0 0 2.1-3.6L13.7 8.4V3"/><path d="M7.4 15h9.2" opacity="0.55"/></svg>
+    </span>
+    <!-- dose-arc, accent -->
+    <span class="float-icon accent" data-depth="0.9" style="top:55%; left:58%; --drift-x:14px; --drift-y:-10px; --drift-rot:-4deg; --drift-dur:11.5s; --drift-delay:1.4s;">
+      <svg width="52" height="30" viewBox="0 0 60 30" fill="none"><path d="M2 26c6 0 8-20 15-20s7 19 14 19 7-14 13-14 7 9 14 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </span>
   </div>
-  <div class="platform-row">
-    <span>Windows</span><span>&middot;</span><span>macOS</span><span>&middot;</span><span>Linux</span>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow eyebrow">SPECIMEN 001&ndash;288 &middot; free &amp; open source &middot; no paywall</div>
+    <h1>A field guide<br />to how it feels.</h1>
+    <p class="hero-sub">Substancia maps <b>288 psychoactive substances</b> by how their subjective effects feel &mdash; not by chemistry, not by class &mdash; with dosing, pharmacology, interactions, and cited sources for every one of them.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/feelsunbreeze/substancia/releases/latest">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5v8.4M8 1.5 4.6 4.9M8 1.5l3.4 3.4M2.5 11v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/feelsunbreeze/substancia">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <div class="platform-row">
+      <span>Windows</span><span>&middot;</span><span>macOS</span><span>&middot;</span><span>Linux</span>
+    </div>
   </div>
 </div>
 
@@ -585,6 +654,27 @@
     });
   })();
 
+  (function () {
+    var field = document.querySelector('.hero-field');
+    if (!field || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var icons = field.querySelectorAll('.float-icon');
+    var raf = null;
+    field.parentElement.addEventListener('mousemove', function (e) {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        var rect = field.getBoundingClientRect();
+        var px = (e.clientX - rect.left) / rect.width - 0.5;
+        var py = (e.clientY - rect.top) / rect.height - 0.5;
+        icons.forEach(function (icon) {
+          var depth = parseFloat(icon.getAttribute('data-depth')) || 0.5;
+          icon.style.setProperty('--parallax-x', (px * depth * 18) + 'px');
+          icon.style.setProperty('--parallax-y', (py * depth * 18) + 'px');
+        });
+        raf = null;
+      });
+    });
+  })();
+
   var els = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
@@ -597,6 +687,7 @@
     els.forEach(function (el) { el.classList.add('in'); });
   }
 </script>
+
 
 </body>
 </html>
