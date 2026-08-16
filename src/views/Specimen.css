@@ -445,9 +445,9 @@
     -webkit-mask-image: none;
     mask-image: none;
   }
-  .sp-vitals { order: 2; margin-top: 28px; }
-  .sp-refs { order: 3; }
-  .sp-column { order: 1; }
+  .sp-vitals { order: 1; margin-top: 0; border-top: none; padding-top: 0; }
+  .sp-refs { order: 2; }
+  .sp-column { order: 3; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--hair); }
 }
 
 .prose-numeral {
