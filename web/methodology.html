@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="How Substancia's Firmament map, region names, and receptor kinship are actually computed — no LLM, a deterministic pipeline over PsychonautWiki." />
+<title>How Substancia Works</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="favicon/favicon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="favicon/favicon-512.png" />
+<link rel="apple-touch-icon" href="favicon/favicon-180.png" />
+<link rel="shortcut icon" href="favicon/favicon.ico" />
+<style>
+  :root {
+    --ground: #E9E7DD;
+    --raised: #F1EFE6;
+    --raised-2: #DEDBCE;
+    --ink: #1A1D22;
+    --muted: #5C636C;
+    --faint: #8A9099;
+    --hair: #CBC7BA;
+    --hair-strong: #B3AEA0;
+    --field: #E4E1D4;
+    --accent: #8F7233;
+    --danger: #C0392B;
+    --danger-tint: color-mix(in srgb, var(--danger) 9%, transparent);
+    --accent-tint: color-mix(in srgb, var(--accent) 8%, transparent);
+
+    --display: "Bodoni MT", "Didot", "Constantia", "Playfair Display", Georgia, serif;
+    --body-font: "Cambria", "Constantia", "Palatino Linotype", Georgia, serif;
+    --mono: "Cascadia Mono", "Consolas", ui-monospace, "SF Mono", Menlo, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="obsidian"]) {
+      --ground: #090A0F; --raised: #0F1117; --raised-2: #161921; --ink: #E8E4D8;
+      --muted: #98A0AC; --faint: #676E7A; --hair: #1C1F29; --hair-strong: #333947;
+      --field: #06070B; --accent: #C9AE6B; --danger: #DB6558;
+      --danger-tint: color-mix(in srgb, var(--danger) 12%, transparent);
+      --accent-tint: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #090A0F; --raised: #0F1117; --raised-2: #161921; --ink: #E8E4D8;
+    --muted: #98A0AC; --faint: #676E7A; --hair: #1C1F29; --hair-strong: #333947;
+    --field: #06070B; --accent: #C9AE6B; --danger: #DB6558;
+    --danger-tint: color-mix(in srgb, var(--danger) 12%, transparent);
+    --accent-tint: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  :root[data-theme="obsidian"] {
+    --ground: #000000; --raised: #08080B; --raised-2: #101116; --ink: #E8E4D8;
+    --muted: #949CA8; --faint: #636A76; --hair: #16181F; --hair-strong: #2C313D;
+    --field: #000000; --accent: #C9AE6B; --danger: #DB6558;
+    --danger-tint: color-mix(in srgb, var(--danger) 12%, transparent);
+    --accent-tint: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  :root[data-theme="light"] {
+    --ground: #E9E7DD; --raised: #F1EFE6; --raised-2: #DEDBCE; --ink: #1A1D22;
+    --muted: #5C636C; --faint: #8A9099; --hair: #CBC7BA; --hair-strong: #B3AEA0;
+    --field: #E4E1D4; --accent: #8F7233; --danger: #C0392B;
+    --danger-tint: color-mix(in srgb, var(--danger) 9%, transparent);
+    --accent-tint: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body-font);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  code { font-family: var(--mono); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 48px); }
+
+  .theme-switch {
+    position: fixed; top: 20px; right: 20px; z-index: 50;
+    display: flex; gap: 8px; padding: 6px; border-radius: 20px;
+    background: color-mix(in srgb, var(--raised) 82%, transparent);
+    border: 1px solid var(--hair); backdrop-filter: blur(8px);
+  }
+  .theme-swatch-btn {
+    width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--hair-strong);
+    cursor: pointer; padding: 0; transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
+  }
+  .theme-swatch-btn:hover { transform: scale(1.12); }
+  .theme-swatch-btn[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+  .top {
+    padding: clamp(56px, 12vh, 96px) 0 44px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em;
+    text-decoration: none; color: var(--faint); margin-bottom: 28px;
+  }
+  .back-link:hover { color: var(--muted); }
+  .eyebrow {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 16px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(34px, 5.5vw, 54px); line-height: 1.08;
+    margin: 0 0 20px; text-wrap: balance; max-width: 16ch;
+  }
+  .lede { color: var(--muted); font-size: 18px; max-width: 60ch; margin: 0; }
+  .lede b { color: var(--ink); }
+
+  section.step { padding: 48px 0; border-bottom: 1px solid var(--hair); }
+  section.step:last-of-type { border-bottom: none; }
+  .step-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+  .step-numeral {
+    font-family: var(--mono); font-size: 13px; color: var(--faint);
+    letter-spacing: 0.08em; min-width: 24px;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(24px, 3.2vw, 30px); margin: 0; text-wrap: balance;
+  }
+  .step-body { padding-left: 38px; }
+  .step-body p { margin: 0 0 16px; color: var(--ink); }
+  .step-body p:last-child { margin-bottom: 0; }
+  .step-body .muted { color: var(--muted); }
+
+  .formula {
+    font-family: var(--mono);
+    font-size: 15px;
+    background: var(--field);
+    border: 1px solid var(--hair);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 4px 0 18px;
+    color: var(--accent);
+    overflow-x: auto;
+  }
+  .formula .dim { color: var(--muted); }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    background: var(--field);
+    border: 1px solid var(--hair);
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin: 4px 0 18px;
+    overflow-x: auto;
+    color: var(--muted);
+  }
+  pre .kw { color: var(--accent); }
+
+  .param-row {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--field);
+    border: 1px solid var(--hair);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 4px 0 18px;
+  }
+  .param-row b { color: var(--ink); }
+
+  .stat-row { display: flex; gap: 28px; flex-wrap: wrap; margin: 20px 0 4px; }
+  .stat { }
+  .stat-n { font-family: var(--display); font-size: 30px; color: var(--accent); line-height: 1; }
+  .stat-l { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--faint); text-transform: uppercase; margin-top: 6px; }
+
+  .case {
+    border-left: 2px solid var(--hair-strong);
+    padding: 4px 0 4px 18px;
+    margin: 18px 0;
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+  .case b { color: var(--ink); }
+
+  .callout {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 20px 24px; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--hair-strong));
+    border-left-width: 3px; border-radius: 0 6px 6px 0; background: var(--accent-tint);
+    margin: 22px 0;
+  }
+  .callout.warn { border-color: color-mix(in srgb, var(--danger) 40%, var(--hair-strong)); background: var(--danger-tint); }
+  .callout.warn svg { color: var(--danger); }
+  .callout svg { color: var(--accent); flex-shrink: 0; margin-top: 3px; }
+  .callout-head {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .callout.warn .callout-head { color: var(--danger); }
+  .callout p { margin: 0 0 10px; color: var(--ink); font-size: 15.5px; line-height: 1.6; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout code { font-size: 0.88em; background: var(--raised-2); padding: 1px 5px; border-radius: 3px; }
+
+  footer { padding: 44px 0 60px; }
+  .foot-links { display: flex; gap: 22px; font-family: var(--mono); font-size: 11.5px; flex-wrap: wrap; }
+  .foot-links a { text-decoration: none; color: var(--faint); }
+  .foot-links a:hover { color: var(--muted); }
+</style>
+</head>
+<body>
+
+
+<div class="theme-switch" role="group" aria-label="Theme">
+  <button class="theme-swatch-btn" data-theme-btn="dark" title="Nocturne" style="background:#0F1117"></button>
+  <button class="theme-swatch-btn" data-theme-btn="obsidian" title="Obsidian" style="background:#08080B"></button>
+  <button class="theme-swatch-btn" data-theme-btn="light" title="Vellum" style="background:#F1EFE6"></button>
+</div>
+
+<div class="wrap top">
+  <a class="back-link" href="./">&larr; Substancia</a>
+  <div class="eyebrow">methodology &middot; not an LLM</div>
+  <h1>How the Firmament is built</h1>
+  <p class="lede">Substancia's map, its region names, and its "nearest kin" rankings all come from a
+    deterministic pipeline over <b>PsychonautWiki</b>'s public wiki content &mdash; TF&ndash;IDF vectors,
+    cosine similarity, UMAP, graph community detection, and a rule-based extractor over pharmacology
+    prose. No language model touches the dataset or the layout.</p>
+</div>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">I</span><h2>Source and scope</h2></div>
+    <div class="step-body">
+      <p>Every specimen starts as a scraped <a href="https://psychonautwiki.org" target="_blank" rel="noopener">PsychonautWiki</a>
+        article &mdash; a community-edited wiki, not a clinical database. That's a real constraint, not
+        a footnote: coverage is uneven, some articles are stubs, and the structured "effects" a
+        substance carries reflect what editors documented, not a controlled study.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n">288</div><div class="stat-l">specimens compiled</div></div>
+        <div class="stat"><div class="stat-n">314</div><div class="stat-l">canonical effect names</div></div>
+        <div class="stat"><div class="stat-n">202</div><div class="stat-l">have a receptor-target profile</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">II</span><h2>Cleaning the vocabulary</h2></div>
+    <div class="step-body">
+      <p>Scraped effect names arrive damaged two ways. Unparsed wiki-link syntax leaves real effects
+        wearing a broken prefix (<code>[[Brightness alteration</code>), and unfilled infobox templates
+        leave placeholder strings that name nothing (<code>Cognitive effect1</code>). Junk names are
+        rare by construction, so left alone they'd get weighted enormously by the very statistic
+        (below) that's supposed to find what's distinctive &mdash; a handful of substances would get
+        pulled into spurious clusters built entirely out of scraping damage. Normalisation happens
+        before vectorisation, not after.</p>
+      <p>A second, corpus-wide pass folds spelling variants together &mdash; names that differ only by
+        punctuation or a trailing plural collapse to one canonical spelling, chosen deterministically
+        so the same input always produces the same output:</p>
+      <pre>def _morphological_key(name: str) -> str:
+    s = re.sub(r<span class="kw">"[,\-–—]"</span>, <span class="kw">" "</span>, name.lower())
+    s = re.sub(r<span class="kw">"[^a-z0-9 ]"</span>, <span class="kw">""</span>, s)
+    words = [w[:-1] if len(w) > 3 and w.endswith(<span class="kw">"s"</span>) else w for w in s.split()]
+    return <span class="kw">" "</span>.join(w for w in words if w)</pre>
+      <p class="muted">This is deliberately orthographic, not semantic. PsychonautWiki redirects "Ego
+        death" and "Memory suppression" to the same article, but merging those is a judgement about
+        phenomenology, not a spelling fix &mdash; so they're left apart.</p>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">III</span><h2>The map itself</h2></div>
+    <div class="step-body">
+      <p>Each substance becomes a vector across all 314 canonical effects, weighted by inverse document
+        frequency &mdash; an effect nearly every substance reports carries almost no information about
+        what makes a substance distinct, while a rare one is highly diagnostic:</p>
+      <div class="formula">idf(t) = ln((N + 1) / (df(t) + 1)) + 1</div>
+      <p>Two substances' similarity is the cosine of the angle between their weighted vectors, not the
+        distance &mdash; a thoroughly-documented substance has a longer vector without being
+        <em>different in kind</em>, and cosine ignores that, comparing direction instead of magnitude:</p>
+      <div class="formula">sim(a, b) = (v<span class="dim">a</span> &middot; v<span class="dim">b</span>) / (&#8214;v<span class="dim">a</span>&#8214; &#8214;v<span class="dim">b</span>&#8214;)</div>
+      <p>The 2D layout comes from UMAP over that similarity space:</p>
+      <div class="param-row"><b>metric</b>=cosine &nbsp; <b>n_neighbors</b>=15 &nbsp; <b>min_dist</b>=0.3 &nbsp; <b>random_state</b>=42</div>
+      <p class="muted">The fixed seed means the same corpus always produces the same map &mdash; without
+        it, screenshots and documentation would drift out of sync with what you actually see.</p>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">IV</span><h2>Naming the regions</h2></div>
+    <div class="step-body">
+      <p>The map shows what's close together but not why, so region names come from clustering the
+        <em>similarity graph directly</em> &mdash; each substance connected to its 8 most similar
+        neighbours &mdash; rather than the projected 2D coordinates, so the grouping doesn't inherit
+        distortion the projection introduces. Greedy modularity maximisation over that graph produces
+        8 communities.</p>
+      <p>Each region is then labelled from its own members: their weighted effect scores are summed,
+        and the six highest-weighted effects become the label. Summing <em>weighted</em> rather than
+        raw counts is what makes labels like <em>frame rate suppression</em> or <em>memory
+        displacement</em> come out instead of whatever's simply common everywhere.</p>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">V</span><h2>Reading receptor targets from prose</h2></div>
+    <div class="step-body">
+      <p>The "binds like" panel comes from a rule-based extractor that reads receptor and transporter
+        mentions directly out of each article's Pharmacology section &mdash; forty target patterns
+        matched per sentence, each scored and signed from the nearest directional cue. Three failure
+        modes needed explicit handling:</p>
+      <div class="case"><b>Tool compounds.</b> "A selective 5-HT2A antagonist blocks the actions of
+        DPT" is not a claim about DPT's own binding &mdash; naive matching would record it as one,
+        backwards. These constructions are detected and discarded rather than inverted.</div>
+      <div class="case"><b>Multi-target sentences.</b> "A 5-HT2A agonist with NMDA antagonist
+        activity" names two targets with opposite directions in one sentence, so direction is resolved
+        per mention by token distance, not per sentence.</div>
+      <div class="case"><b>Negation.</b> "Does not bind," "no appreciable affinity," and "lacks
+        activity at" all invert the reading and are matched out. Hedged claims ("may," "is thought
+        to") aren't dropped, but reduce confidence, so an explicit adjacent cue outweighs a distant
+        hedged one.</div>
+      <p>Because this is heuristic, it's measured rather than assumed &mdash; a hand-curated
+        ground-truth set drives an accuracy harness, and the build fails if extraction accuracy falls
+        below a set floor.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n">95.8%</div><div class="stat-l">directional accuracy</div></div>
+        <div class="stat"><div class="stat-n">31</div><div class="stat-l">pair ground truth set</div></div>
+        <div class="stat"><div class="stat-n">85%</div><div class="stat-l">accuracy floor, build fails below it</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">VI</span><h2>Where feeling and binding disagree</h2></div>
+    <div class="step-body">
+      <p>Every specimen carries two independent similarity rankings &mdash; one from reported subjective
+        effects, one from extracted receptor targets. The Divergence panel is simply the two compared:</p>
+      <div class="formula">divergence = effect_similarity &minus; target_similarity</div>
+      <p>A substance can feel like another without sharing its pharmacology, or share pharmacology
+        without feeling alike &mdash; both are real, and the panel exists to show which one you're
+        looking at, rather than quietly picking one.</p>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <div class="step-head"><span class="step-numeral">VII</span><h2>Where this breaks, stated plainly</h2></div>
+    <div class="step-body">
+      <p>Two limitations worth knowing before you trust a result at face value:</p>
+
+      <div class="callout">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 6.5v4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="13.7" r="0.9" fill="currentColor"/></svg>
+        <div>
+          <div class="callout-head">Map position isn't ground truth</div>
+          <p>UMAP only guarantees <em>local</em> neighbourhood preservation, not that every true nearest
+            pair stays visually adjacent in 2D. Concretely: <b>Pregabalin and Gabapentin are each
+            other's #1 nearest neighbour</b> in the actual similarity graph (cosine 0.61, one of the
+            strongest pairings in the dataset) &mdash; but they land in different named regions on the
+            map, roughly 2.7 units apart on a map spanning about 26. The ranked <b>Nearest Kin</b> list
+            on each specimen's own page is the authoritative answer; pixel distance on the Firmament is
+            an approximation of it, not a replacement.</p>
+          <p>Community boundaries can cut through locally continuous space the same way &mdash;
+            <b>Kratom</b> sits map-adjacent to Tapentadol (an opioid, its actual #1 neighbour) but the
+            two fall into different named regions.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2 1.5 17h17L10 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="14.5" r="0.9" fill="currentColor"/></svg>
+        <div>
+          <div class="callout-head">Receptor coverage is thin</div>
+          <p>Only <b>21 of 202</b> substances have four or more extracted targets. Below that, cosine
+            similarity on a near-empty vector produces meaningless matches &mdash; during development,
+            a substance with a single extracted target came out "binding like" an unrelated compound
+            at a similarity of 1.00, which is an artefact of sparse data dressed up as a
+            pharmacological claim. Both the binding-neighbour list and the divergence panel are gated
+            at a four-target minimum on both sides; below that, nothing is shown rather than something
+            false. The honest result is that <b>181 of 202</b> substances currently show no binding
+            relatives at all.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="./">&larr; Back to Substancia</a>
+      <a href="app/">Launch in Browser</a>
+      <a href="https://github.com/feelsunbreeze/substancia">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var STORAGE_KEY = 'substancia-site-theme';
+    var btns = document.querySelectorAll('[data-theme-btn]');
+    function applyTheme(t) {
+      if (t) document.documentElement.setAttribute('data-theme', t);
+      else document.documentElement.removeAttribute('data-theme');
+      btns.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-theme-btn') === t));
+      });
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    applyTheme(saved || 'dark');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-theme-btn');
+        applyTheme(t);
+        try { localStorage.setItem(STORAGE_KEY, t); } catch (e) {}
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

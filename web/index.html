@@ -376,6 +376,20 @@
   .tier-note a { color: var(--accent); }
 
   /* ---------- theme switcher ---------- */
+  .top-nav-link {
+    position: fixed;
+    top: 26px;
+    left: 20px;
+    z-index: 50;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    color: var(--faint);
+  }
+  .top-nav-link:hover { color: var(--muted); }
+  @media (max-width: 560px) { .top-nav-link { display: none; } }
+
   .theme-switch {
     position: fixed;
     top: 20px;
@@ -430,6 +444,8 @@
 
 
 
+
+<a class="top-nav-link" href="methodology.html">How it works</a>
 
 <div class="theme-switch" role="group" aria-label="Theme">
   <button class="theme-swatch-btn" data-theme-btn="dark" title="Nocturne — ink-black, blue undertone" style="background:#0F1117"></button>
@@ -632,6 +648,7 @@
         <span>Substancia</span>
       </div>
       <div class="foot-links">
+        <a href="methodology.html">How it works</a>
         <a href="https://github.com/feelsunbreeze/substancia">GitHub</a>
         <a href="https://github.com/feelsunbreeze/substancia/releases/latest">Releases</a>
         <a href="https://ko-fi.com/feelsunbreeze">Ko-fi</a>
